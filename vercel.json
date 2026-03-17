@@ -1,15 +1,7 @@
 {
-  "version": 2,
-  "framework": "nextjs",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "headers": [
     {
-      "source": "/(.*).(jpg|jpeg|png|webp|avif)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
