@@ -170,8 +170,7 @@ export default function PartnerPage() {
               {/* Contact details */}
               <div className="contact-detail reveal r4">
                 {[
-                  { k: 'General',         v: 'info@vortexsystem.org', href: 'mailto:info@vortexsystem.org' },
-                  { k: 'Defence',         v: 'info@vortexsystem.org', href: 'mailto:info@vortexsystem.org' },
+                  { k: 'Email',         v: 'info@vortexsystem.org', href: 'mailto:info@vortexsystem.org' },
                   { k: 'Location',        v: 'Ghaziabad, Uttar Pradesh · India', href: null },
                   { k: 'DPIIT',           v: 'Recognised Startup', href: null, green: true },
                   { k: 'GeM portal',      v: 'Registered vendor', href: null, green: true },
