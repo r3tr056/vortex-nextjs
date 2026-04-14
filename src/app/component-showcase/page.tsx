@@ -323,12 +323,12 @@ export default function ComponentShowcase() {
                     <FormRow>
                       <FormField>
                         <Label>First Name</Label>
-                        <Input type="text" placeholder="Arjun" />
+                        <Input type="text" placeholder="Ankur" />
                       </FormField>
 
                       <FormField>
                         <Label>Last Name</Label>
-                        <Input type="text" placeholder="Sharma" />
+                        <Input type="text" placeholder="Debnath" />
                       </FormField>
                     </FormRow>
 

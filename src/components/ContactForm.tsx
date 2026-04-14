@@ -15,11 +15,11 @@ export default function ContactForm() {
       <div className="form-row">
         <div className="form-field">
           <label className="form-label">First Name</label>
-          <input className="form-input" type="text" placeholder="Arjun" required />
+          <input className="form-input" type="text" placeholder="Ankur" required />
         </div>
         <div className="form-field">
           <label className="form-label">Last Name</label>
-          <input className="form-input" type="text" placeholder="Sharma" required />
+          <input className="form-input" type="text" placeholder="Debnath" required />
         </div>
       </div>
 

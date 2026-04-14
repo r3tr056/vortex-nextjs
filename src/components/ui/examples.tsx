@@ -203,12 +203,12 @@ export function ContactFormExample() {
             <FormRow>
               <FormField>
                 <Label>First Name</Label>
-                <Input type="text" placeholder="Arjun" required />
+                <Input type="text" placeholder="Ankur" required />
               </FormField>
 
               <FormField>
                 <Label>Last Name</Label>
-                <Input type="text" placeholder="Sharma" required />
+                <Input type="text" placeholder="Debnath" required />
               </FormField>
             </FormRow>
 

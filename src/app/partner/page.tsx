@@ -215,9 +215,14 @@ export default function PartnerPage() {
           </div>
 
           <div style={{ position: 'relative', zIndex: 1 }} className="reveal r3">
-            <Link href="#contact-form" className="btn-primary" style={{ fontSize: 14, padding: '16px 28px' }}>
-              Schedule a Field Demo <span className="arr">→</span>
-            </Link>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link href="#contact-form" className="btn-primary" style={{ fontSize: 14, padding: '16px 28px' }}>
+                Schedule a Field Demo <span className="arr">→</span>
+              </Link>
+              <Link href="/partner/one-pager" className="btn-outline" style={{ fontSize: 13 }}>
+                Open One Pager
+              </Link>
+            </div>
           </div>
         </section>
 

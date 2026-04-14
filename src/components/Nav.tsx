@@ -11,6 +11,7 @@ const navLinks = [
   { href: '/capabilities', label: 'Capabilities' },
   { href: '/company', label: 'Company' },
   { href: '/partner', label: 'Partner' },
+  { href: '/partner/one-pager', label: 'One Pager' },
 ];
 
 export default function Nav() {

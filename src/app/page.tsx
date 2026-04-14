@@ -259,7 +259,7 @@ export default function HomePage() {
 
             {/* Closing statement */}
             <div style={{ marginTop: 52, textAlign: 'center', paddingTop: 32, borderTop: `1px solid ${LINE}` }} className="reveal r5">
-              <Mono color={MUTED}>Vortex Autonomous Systems — Ghaziabad, UP.</Mono>
+              <Mono color={MUTED}>Vortex Autonomous Systems — UP.</Mono>
             </div>
           </div>
         </section>
