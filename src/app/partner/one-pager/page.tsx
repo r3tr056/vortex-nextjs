@@ -30,7 +30,7 @@ export default function PartnerOnePager() {
               <div className="op-meta">
                 <div className="op-meta-item">
                   <span className="op-meta-k">Founded</span>
-                  <span className="op-meta-v">2025</span>
+                  <span className="op-meta-v">2026</span>
                 </div>
                 <div className="op-meta-item">
                   <span className="op-meta-k">Team</span>

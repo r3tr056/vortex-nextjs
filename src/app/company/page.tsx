@@ -7,7 +7,7 @@ import { timeline, values } from '@/data';
 
 export const metadata = {
   title: 'Company — Vortex Autonomous Systems',
-  description: 'DPIIT-registered defence technology startup based in UP. Engineers first. Zero Chinese components. TRL 6 across all platforms.',
+  description: 'DPIIT-registered defence technology startup based in Ghaziabad, UP. Engineers first. Zero Chinese components. TRL 6 across all platforms.',
 };
 
 const BG        = '#06080D';
@@ -50,7 +50,7 @@ export default function CompanyPage() {
               </p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <span className="tag tag-green">DPIIT Registered</span>
-                <span className="tag">UP · India</span>
+                <span className="tag">Ghaziabad, UP · India</span>
                 <span className="tag tag-blue">Zero Chinese Components</span>
               </div>
             </div>
