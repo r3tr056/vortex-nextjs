@@ -2,9 +2,9 @@ import Nav from '@/components/Nav';
 import CustomCursor from '@/components/CustomCursor';
 
 export const metadata = {
-  title: 'Vortex Investor One Pager',
+  title: 'Vortex Pre-Seed One Pager',
   description:
-    'Investor one-pager for Vortex Autonomous Systems with market, traction, moat, team, and raise details.',
+    'Pre-seed one-pager for Vortex Autonomous Systems covering problem, solution, market, traction, business model, team, and raise.',
 };
 
 export default function PartnerOnePager() {
@@ -16,30 +16,21 @@ export default function PartnerOnePager() {
       <main className="pt-nav onepager-page">
         <article className="sheet">
           <div className="topbar">
-            <span className="topbar-l">Vortex Autonomous Systems · Investor One-Pager 2025</span>
-            <span className="topbar-r">Confidential</span>
+            <span className="topbar-l">Vortex Autonomous Systems</span>
+            <span className="topbar-r">Pre-Seed · April 2026</span>
           </div>
 
           <div className="op-hero">
             <div className="op-hero-left">
-              <div className="op-eyebrow">Deep-Tech · Defense · Autonomous Systems</div>
+              <div className="op-eyebrow">Autonomous Drone Intelligence · India</div>
               <h1 className="op-title">
-                India&apos;s <em>Indigenous</em>
-                <br />
-                Autonomous
-                <br />
-                Defense
-                <br />
-                Intelligence Stack
+                Making Drones <em>Think.</em>
               </h1>
-              <p className="op-sub">
-                AI-powered autonomy for drones, unmanned vessels and battlefield systems - GPS-denied,
-                EW-hardened, zero Chinese components.
-              </p>
+              <p className="op-sub">India&apos;s first end-to-end autonomous drone company.</p>
               <div className="op-meta">
                 <div className="op-meta-item">
                   <span className="op-meta-k">Founded</span>
-                  <span className="op-meta-v">2023</span>
+                  <span className="op-meta-v">2025</span>
                 </div>
                 <div className="op-meta-item">
                   <span className="op-meta-k">Team</span>
@@ -59,20 +50,20 @@ export default function PartnerOnePager() {
 
           <div className="stats">
             <div className="stat">
-              <div className="stat-n">TRL 6</div>
-              <div className="stat-l">Platform Readiness</div>
+              <div className="stat-n">3</div>
+              <div className="stat-l">Platforms Proven</div>
             </div>
             <div className="stat">
-              <div className="stat-n">6</div>
-              <div className="stat-l">Autonomous Platforms</div>
+              <div className="stat-n">3</div>
+              <div className="stat-l">In Dev Pipeline</div>
             </div>
             <div className="stat">
-              <div className="stat-n">70%</div>
-              <div className="stat-l">Made in India</div>
+              <div className="stat-n">3,500m+</div>
+              <div className="stat-l">Altitude Proven</div>
             </div>
             <div className="stat">
-              <div className="stat-n">0</div>
-              <div className="stat-l">Chinese Components</div>
+              <div className="stat-n">2</div>
+              <div className="stat-l">iDEX Apps Filed</div>
             </div>
           </div>
 
@@ -80,89 +71,83 @@ export default function PartnerOnePager() {
             <div className="col-l">
               <div className="sec">
                 <div className="sec-tag">01 · Problem</div>
-                <div className="sec-head">The Gap India Can&apos;t Afford</div>
+                <div className="sec-head">The Problem</div>
                 <div className="sec-body">
-                  India spends <strong>Rs 55,000+ Cr annually on UAVs</strong> yet no indigenous platform survives
-                  GPS-denied, EW-contested environments. The country remains strategically dependent on imported,
-                  often Chinese-origin technology for critical missions.
+                  Drones today follow GPS waypoints, depend on human operators, and collapse under operational
+                  stress. No Indian company offers a vertically integrated autonomous system.
                 </div>
                 <ul className="pts">
                   <li>
-                    <strong>80%+ components imported</strong> - critical strategic liability
+                    <strong>46/46 indigenous drone makers</strong> failed Army EW trials in 2025
                   </li>
-                  <li>
-                    <strong>Zero fielded EW-hardened</strong> autonomous nav stack exists
-                  </li>
+                  <li>India still lacks a flight-ready autonomous intelligence stack built as one system</li>
                 </ul>
               </div>
 
               <div className="sec">
                 <div className="sec-tag">02 · Solution</div>
-                <div className="sec-head">VortexCore Autonomy Stack</div>
+                <div className="sec-head">The Solution</div>
                 <div className="sec-body">
-                  Vortex builds the <strong>intelligence layer inside every platform</strong> - GPS-denied nav,
-                  EW-resistant secure comms, swarm coordination, and cloud mission control. Fully vertically
-                  integrated: airframe to firmware.
+                  Complete autonomous intelligence platform - hardware, onboard AI, ML-driven navigation, and
+                  mission C2 - delivered as one integrated system.
                 </div>
                 <div className="chips">
-                  <div className="chip">VortexCore</div>
-                  <div className="chip">Atlas-200</div>
-                  <div className="chip">Hornet ISR</div>
-                  <div className="chip b">Vortex Cloud</div>
-                  <div className="chip b">NTWC GCS</div>
-                  <div className="chip">Sentinel</div>
-                  <div className="chip">Ranger</div>
+                  <div className="chip">Vortex Delta</div>
+                  <div className="chip">Onboard AI</div>
+                  <div className="chip">Mission C2</div>
+                  <div className="chip b">3 Flight-Proven</div>
+                  <div className="chip b">3 In Development</div>
+                  <div className="chip">70% Indian Components</div>
+                  <div className="chip">EW-Resilient Direction</div>
                 </div>
               </div>
 
               <div className="sec">
                 <div className="sec-tag">03 · Market Opportunity</div>
-                <div className="sec-head">India&apos;s UAV Moment Is Now</div>
+                <div className="sec-head">Market Opportunity</div>
                 <div className="sec-body">
-                  iDEX, Atmanirbhar Bharat and the Army&apos;s 10-year modernisation plan are unlocking unprecedented
-                  B2G procurement. The tailwind is structural.
+                  India&apos;s drone market is entering a structural growth cycle, with defense procurement and enterprise
+                  adoption both accelerating.
                 </div>
                 <div className="mkt">
                   <div className="mkt-box">
                     <div className="mkt-lbl">TAM</div>
-                    <div className="mkt-val">Rs 55,000+ Cr</div>
-                    <div className="mkt-sub">Defense UAV procurement</div>
+                    <div className="mkt-val">$4.8B</div>
+                    <div className="mkt-sub">India drone market by 2030</div>
                   </div>
                   <div className="mkt-box">
                     <div className="mkt-lbl">SAM</div>
-                    <div className="mkt-val">Rs 8,500 Cr</div>
-                    <div className="mkt-sub">Autonomous ISR and logistics</div>
+                    <div className="mkt-val">Rs 4,300 Cr+</div>
+                    <div className="mkt-sub">Defense + enterprise over 7 years</div>
                   </div>
                   <div className="mkt-box alt">
-                    <div className="mkt-lbl">Entry Channel</div>
-                    <div className="mkt-val">iDEX + GeM</div>
-                    <div className="mkt-sub">Direct defense procurement</div>
+                    <div className="mkt-lbl">SOM</div>
+                    <div className="mkt-val">Rs 30-50 Cr</div>
+                    <div className="mkt-sub">3-year ARR target</div>
                   </div>
                   <div className="mkt-box alt">
-                    <div className="mkt-lbl">Live Submissions</div>
-                    <div className="mkt-val">2 Active</div>
-                    <div className="mkt-sub">iDEX DISC in-process</div>
+                    <div className="mkt-lbl">Tailwind</div>
+                    <div className="mkt-val">MoD FY27</div>
+                    <div className="mkt-sub">Rs 7.85L Cr budget, 75% reserved for Indian companies</div>
                   </div>
                 </div>
               </div>
 
               <div className="sec">
                 <div className="sec-tag">04 · Traction</div>
-                <div className="sec-head">Built and Battle-Tested</div>
+                <div className="sec-head">Traction</div>
                 <ul className="pts">
                   <li>
-                    <strong>DPIIT Recognised</strong> deep-tech defense startup
+                    <strong>3 platforms proven</strong> and 3 more in active development
                   </li>
                   <li>
-                    <strong>iDEX DISC SPARK</strong> - autonomous VTOL swarm carrier (Army)
+                    <strong>3,500m+ altitude</strong> proven in operations
                   </li>
                   <li>
-                    <strong>iDEX DISC CP-6</strong> - ATLAS-200 heavy-lift IC-hybrid logistics drone
+                    SIH Winner · DPIIT deep-tech · GeM registered
                   </li>
-                  <li>
-                    <strong>5,500m AMSL</strong> validated operational ceiling, Ladakh-proven
-                  </li>
-                  <li>ISRO IROC-U · SIH 2025 · NIDAR 2025 - Team ASTRA, AKGEC</li>
+                  <li>Ladakh ops proven</li>
+                  <li><strong>2 iDEX applications filed</strong></li>
                 </ul>
               </div>
             </div>
@@ -170,85 +155,63 @@ export default function PartnerOnePager() {
             <div className="col-r">
               <div className="sec">
                 <div className="sec-tag">05 · Business Model</div>
-                <div className="sec-head">B2G Defense Procurement</div>
+                <div className="sec-head">Business Model</div>
                 <div className="kv">
                   <div className="kv-row">
-                    <span className="kv-k">Revenue</span>
-                    <span className="kv-v">iDEX contracts + GeM platform sales</span>
+                    <span className="kv-k">Platform Sales</span>
+                    <span className="kv-v">Drone systems to Army, Navy, ITBP, BSF, and enterprises</span>
                   </div>
                   <div className="kv-row">
-                    <span className="kv-k">Customer</span>
-                    <span className="kv-v">Indian Army, Navy, Paramilitary</span>
+                    <span className="kv-k">Autonomy Licensing</span>
+                    <span className="kv-v">Vortex Delta module licensed to OEMs for MoD qualification</span>
                   </div>
                   <div className="kv-row">
-                    <span className="kv-k">Channel</span>
-                    <span className="kv-v">iDEX DISC to GeM procurement</span>
+                    <span className="kv-k">Cloud SaaS</span>
+                    <span className="kv-v">Fleet management and analytics priced per drone per month</span>
                   </div>
                   <div className="kv-row">
-                    <span className="kv-k">Verticals</span>
-                    <span className="kv-v">Defense, ISR, Logistics, Agriculture</span>
-                  </div>
-                  <div className="kv-row">
-                    <span className="kv-k">IP</span>
-                    <span className="kv-v">Proprietary firmware + hardware stack</span>
+                    <span className="kv-k">DaaS</span>
+                    <span className="kv-v">Drone-as-a-Service for agriculture and enterprise ISR</span>
                   </div>
                 </div>
               </div>
 
               <div className="sec">
-                <div className="sec-tag">06 · Competitive Moat</div>
-                <div className="sec-head">Why Vortex Wins</div>
-                <div className="sec-body">
-                  Our moat is not the airframe - it&apos;s the <strong>autonomy intelligence stack</strong> no one else
-                  in India has built, hardened for denied environments where every other system fails.
-                </div>
-                <div className="moat">
-                  <div className="mpill h">EW-Hardened GPS-Denied Nav</div>
-                  <div className="mpill h">Zero Chinese Components</div>
-                  <div className="mpill h">NTWC Wrist Controller</div>
-                  <div className="mpill">Swarm Coordination</div>
-                  <div className="mpill">Series Hybrid Propulsion</div>
-                  <div className="mpill">VectorNav INS + LiDAR</div>
-                  <div className="mpill">MIL-STD-810H Rated GCS</div>
-                </div>
-              </div>
-
-              <div className="sec">
-                <div className="sec-tag">07 · Team</div>
-                <div className="sec-head">Operators and Engineers</div>
+                <div className="sec-tag">06 · Team</div>
+                <div className="sec-head">Team</div>
                 <div className="team">
                   <div className="tm">
                     <span className="tm-name">Avi Mittal</span>
                     <span className="tm-role">CEO</span>
-                    <span className="tm-bio">Strategy, BD, investor relations and GTM</span>
+                    <span className="tm-bio">AI/ML, certified drone pilot. Strategy and defense BD.</span>
                   </div>
                   <div className="tm">
                     <span className="tm-name">Ankur Debnath</span>
                     <span className="tm-role">CTO</span>
-                    <span className="tm-bio">Autonomy stack, avionics and AI/ML</span>
-                  </div>
-                  <div className="tm">
-                    <span className="tm-name">Arya Bhushan</span>
-                    <span className="tm-role">CDO</span>
-                    <span className="tm-bio">Drone design, propulsion and aero</span>
+                    <span className="tm-bio">AI/ML, autonomy stack architect, VortexDelta firmware.</span>
                   </div>
                   <div className="tm">
                     <span className="tm-name">Amogh Varshney</span>
                     <span className="tm-role">CFO</span>
-                    <span className="tm-bio">Finance, compliance and procurement</span>
+                    <span className="tm-bio">Mech eng, certified pilot. Airframe and financial strategy.</span>
                   </div>
                   <div className="tm">
                     <span className="tm-name">Ekansh Mitra</span>
                     <span className="tm-role">COO</span>
-                    <span className="tm-bio">Operations, manufacturing and supply chain</span>
+                    <span className="tm-bio">Supply chain and operations.</span>
+                  </div>
+                  <div className="tm">
+                    <span className="tm-name">Arya Bhushan</span>
+                    <span className="tm-role">CDO</span>
+                    <span className="tm-bio">Product design and UX.</span>
                   </div>
                 </div>
-                <div className="origin">Origin: Team ASTRA · AKGEC · Est. 2023</div>
+                <div className="origin">5 co-founders · operator-builder team</div>
               </div>
 
               <div className="sec">
-                <div className="sec-tag">08 · The Ask</div>
-                <div className="sec-head">Pre-Seed Raise Open</div>
+                <div className="sec-tag">07 · The Ask</div>
+                <div className="sec-head">The Ask</div>
                 <div className="ask-box">
                   <div className="ask-grid">
                     <div className="ask-item">
@@ -256,20 +219,27 @@ export default function PartnerOnePager() {
                       <span className="ask-val">Rs 1 Crore</span>
                     </div>
                     <div className="ask-item">
-                      <span className="ask-lbl">Stage</span>
-                      <span className="ask-val">Pre-Seed</span>
+                      <span className="ask-lbl">Equity</span>
+                      <span className="ask-val">4%</span>
                     </div>
                     <div className="ask-item">
                       <span className="ask-lbl">Post-Money Val.</span>
-                      <span className="ask-val">Rs 20 Cr</span>
+                      <span className="ask-val">Rs 25 Cr</span>
                     </div>
                     <div className="ask-item">
-                      <span className="ask-lbl">Equity Offered</span>
-                      <span className="ask-val">5%</span>
+                      <span className="ask-lbl">Stage</span>
+                      <span className="ask-val">Pre-Seed</span>
                     </div>
                   </div>
                   <div className="ask-use">
-                    <strong>Use of Funds:</strong> 40% Platform R&amp;D · 30% iDEX Execution · 20% Team · 10% Ops
+                    <strong>Use of Funds:</strong> Vortex Delta prototype (35%) · AKASH SAYAKA (25%) · Team (20%) · IP filing + IDDM (12%) · Working capital (8%)
+                  </div>
+                  <div className="ask-use">
+                    <strong>Unlocks:</strong> Rs 1.35 Cr iDEX SPARK · up to Rs 25 Cr ADITI 4.0 · Army EW trial qualification · Seed round at Rs 80-100 Cr valuation (4-5x return)
+                  </div>
+                  <div className="ask-use">
+                    Beyond capital, we&apos;re seeking mentors who understand defense procurement, deep-tech scaling,
+                    and can open doors that no cold email ever will.
                   </div>
                 </div>
               </div>
@@ -278,13 +248,12 @@ export default function PartnerOnePager() {
 
           <div className="doc-footer">
             <div className="footer-l">
-              <a href="mailto:info@vortexsystem.org">info@vortexsystem.org</a> · +91 99717 65564 · +91 98737 17711
+              Avi Mittal · <a href="mailto:info@vortexsystem.org">info@vortexsystem.org</a> · +91 9873717711
             </div>
             <div className="footer-r">www.vortexsystem.org</div>
           </div>
           <div className="disc">
-            For informational purposes only. Does not constitute an offer to sell securities. Confidential - for
-            intended recipients only.
+            Confidential
           </div>
         </article>
       </main>
