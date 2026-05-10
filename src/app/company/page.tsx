@@ -1,193 +1,242 @@
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import CustomCursor from '@/components/CustomCursor';
 import RevealObserver from '@/components/RevealObserver';
 import Link from 'next/link';
 import { timeline, values } from '@/data';
 
 export const metadata = {
-  title: 'Company — Vortex Autonomous Systems',
-  description: 'DPIIT-registered defence technology startup based in Ghaziabad, UP. Engineers first. Zero Chinese components. TRL 6 across all platforms.',
+  title: 'Company — Engineers first, always',
+  description:
+    'DPIIT-registered defence technology startup. Ghaziabad, UP. TRL 6 across six platforms. Zero Chinese components. Registered vendor on GeM · iDEX 2026 applicant.',
 };
 
-const BG        = '#06080D';
-const BG2       = '#0A0E16';
-const BG3       = '#0F1520';
-const LINE      = 'rgba(255,255,255,0.06)';
-const GREEN     = '#94d327';
-const GREEN_DIM = 'rgba(148,211,39,0.08)';
-const GREEN_GLOW= 'rgba(148,211,39,0.14)';
-const MUTED     = '#52607A';
+const teamDisciplines = [
+  { k: 'Aeronautical Engineering', v: 'Airframe · CF structures · motor-arm geometry' },
+  { k: 'Embedded & Avionics',      v: 'ArduPilot · PX4 · Cube Orange Plus integration' },
+  { k: 'AI / ML · Edge Inference', v: 'YOLOv8 · ByteTrack · Jetson deployment' },
+  { k: 'Systems & Firmware',       v: 'VortexDelta custom stack · MAVLink routing' },
+  { k: 'Cloud GCS Platform',       v: 'FastAPI · real-time telemetry · NPNT compliant' },
+  { k: 'Field Operations',         v: 'High-altitude · desert · tropical validation' },
+];
+
+const credentials = [
+  { k: 'Entity',        v: 'Vortex Autonomous Systems Pvt. Ltd.' },
+  { k: 'Registration',  v: 'DPIIT Recognised Startup' },
+  { k: 'Founded',       v: '2026 · Ghaziabad, UP' },
+  { k: 'Platform TRL',  v: 'TRL 6 · all six platforms' },
+  { k: 'Supply chain',  v: '0 Chinese-origin components' },
+  { k: 'iDEX',          v: 'Open Challenge applicant · 2026' },
+  { k: 'GeM',           v: 'Registered vendor' },
+  { k: 'NPNT',          v: 'Digital Sky compliant' },
+];
 
 export default function CompanyPage() {
   return (
     <>
-      <CustomCursor />
       <Nav />
       <RevealObserver />
 
-      <main className="pt-nav" style={{ background: BG }}>
-
-        {/* ══════════════════════════════════════════════════════
-            HERO
-        ══════════════════════════════════════════════════════ */}
-        <div className="company-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div className="company-hero-bg" />
-          <div className="noise" />
-          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 55% 65% at 15% 55%, ${GREEN_GLOW} 0%, transparent 65%)`, pointerEvents: 'none', zIndex: 0 }} />
-          <div className="ghost-text" style={{ position: 'absolute', top: 80, right: 56, zIndex: 0 }}>VORTEX</div>
-
-          <div className="company-grid-content" style={{ position: 'relative', zIndex: 1 }}>
+      <main id="main" className="pt-nav">
+        {/* HERO */}
+        <section
+          className="section-tight"
+          style={{ borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}
+        >
+          <div className="ambient-tl" />
+          <div className="container split-7-5" style={{ position: 'relative' }}>
             <div>
-              <div className="eyebrow reveal r1">Who We Are</div>
-              <h1 className="h1 reveal r2">
+              <span className="eyebrow reveal r1">Who We Are</span>
+              <h1 className="h1 display reveal r2">
                 Engineers first.<br /><span className="g">Always.</span>
               </h1>
             </div>
-            <div className="reveal r3">
-              <p className="body-lg" style={{ marginBottom: 24 }}>
-                Vortex Autonomous Systems was founded by a team that had spent years watching India depend on foreign platforms for missions that Indian engineers were fully capable of designing better.
+            <div className="reveal r3" style={{ alignSelf: 'end' }}>
+              <p className="body-lg" style={{ marginBottom: 20 }}>
+                A DPIIT-registered defence technology company building autonomous UAV platforms in
+                Ghaziabad, UP. Flight-validated across Ladakh high-altitude, coastal humidity,
+                and agricultural flatland.
               </p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <span className="tag tag-green">DPIIT Registered</span>
-                <span className="tag">Ghaziabad, UP · India</span>
-                <span className="tag tag-blue">Zero Chinese Components</span>
+                <span className="tag tag-green">DPIIT Startup</span>
+                <span className="tag">Ghaziabad · UP</span>
+                <span className="tag tag-blue">0 Chinese Components</span>
               </div>
-            </div>
-          </div>
-        </div>
-
-
-        {/* ══════════════════════════════════════════════════════
-            WHO WE ARE — body copy
-        ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, background: BG2, borderBottom: `1px solid ${LINE}` }}>
-          <div style={{ padding: '80px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start', position: 'relative' }}>
-            <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 60% 70% at 80% 30%, ${GREEN_DIM} 0%, transparent 65%)`, pointerEvents: 'none' }} />
-
-            <div style={{ position: 'relative' }}>
-              <div className="eyebrow reveal r1" style={{ marginBottom: 24 }}>About the Company</div>
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4', marginBottom: 32 }} className="reveal r2">
-                We are a DPIIT-registered<br />defence technology startup<br />based in <span style={{ color: GREEN }}>Ghaziabad, UP.</span>
-              </h2>
-              {/* Credential strip */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 1, background: LINE }}>
-                {[
-                  { k: 'Entity',        v: 'Vortex Autonomous Systems Pvt. Ltd.' },
-                  { k: 'Registration',  v: 'DPIIT Recognised Startup' },
-                  { k: 'Location',      v: 'Ghaziabad, Uttar Pradesh · India' },
-                  { k: 'Platform TRL',  v: 'TRL 6 across all six platforms' },
-                  { k: 'Supply chain',  v: '0 Chinese-origin components' },
-                  { k: 'iDEX status',   v: 'Open Challenge applicant · 2026' },
-                ].map((r) => (
-                  <div key={r.k} className="spec-row" style={{ background: BG3 }}>
-                    <span className="spec-key">{r.k}</span>
-                    <span className="spec-value">{r.v}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 22, position: 'relative' }}>
-              {[
-                'We are a DPIIT-registered defence technology startup based in Ghaziabad, Uttar Pradesh. Our team spans aeronautical engineering, embedded systems, AI/ML, and military operations. We have flown our platforms in conditions ranging from Ladakh high-altitude to coastal humidity to agricultural flatland.',
-                'We do not operate in stealth mode. We publish our TRL status, our design constraints, and our supply chain policy because we believe transparency is the only way to build the institutional trust that defence procurement demands.',
-                'If you are looking for a vendor with a polished pitch deck and no flight hours — we are not that company.',
-                'If you need platforms that work, documentation that holds up to scrutiny, and a team you can call at 2am when a mission timeline shifts — talk to us.',
-              ].map((para, i) => (
-                <p key={i} style={{
-                  fontSize: i === 2 || i === 3 ? 16 : 15,
-                  color: i === 2 ? MUTED : i === 3 ? '#C8D8E8' : '#8A9BB8',
-                  lineHeight: 1.82,
-                  fontWeight: i === 3 ? 500 : 400,
-                  fontStyle: i === 2 ? 'italic' : 'normal',
-                }} className="reveal r3">
-                  {para}
-                </p>
-              ))}
             </div>
           </div>
         </section>
 
-
-        {/* ══════════════════════════════════════════════════════
-            TIMELINE
-        ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: '80px 56px', background: BG, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 45% 60% at 85% 40%, ${GREEN_DIM} 0%, transparent 65%)`, pointerEvents: 'none' }} />
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 80, alignItems: 'start', position: 'relative', zIndex: 1 }}>
+        {/* Credentials block */}
+        <section style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
+          <div className="container section-tight split-5-5">
             <div>
-              <div className="eyebrow reveal r1">Timeline</div>
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 0.88, letterSpacing: '-0.015em', color: '#E4EAF4', marginBottom: 24 }} className="reveal r2">
-                How we<br />got here.
+              <span className="eyebrow reveal r1">Credentials</span>
+              <h2 className="h2 reveal r2" style={{ marginBottom: 28 }}>
+                Documentation buyers<br /><span className="g">can verify.</span>
               </h2>
-              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.8 }} className="reveal r3">
-                From ISRO&apos;s IROC-U challenge to NIDAR to a registered drone startup — one competition cycle, six platforms, zero shortcuts.
+              <p className="body-md reveal r3" style={{ marginBottom: 24, maxWidth: 440 }}>
+                Registration, supply-chain posture, and platform readiness — each line verifiable
+                against official records on request.
               </p>
+              <Link href="/partner#contact-form" className="btn-outline reveal r3">
+                Request due-diligence pack
+              </Link>
             </div>
 
-            <div className="origin-timeline">
-              {timeline.map((item, idx) => (
-                <div key={item.year} className="timeline-item reveal" style={{ transitionDelay: `${idx * 0.07}s` }}>
-                  <div className="tl-year">{item.year}</div>
-                  <div>
-                    <div className="tl-title">{item.title}</div>
-                    <p className="tl-body">{item.body}</p>
-                  </div>
+            <div className="spec-table reveal r3" style={{ border: '1px solid var(--line)' }}>
+              {credentials.map((r) => (
+                <div key={r.k} className="spec-row" style={{ padding: '14px 18px' }}>
+                  <span className="spec-key">{r.k}</span>
+                  <span className="spec-value">{r.v}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-
-        {/* ══════════════════════════════════════════════════════
-            OPERATING PRINCIPLES
-        ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, background: BG2, borderBottom: `1px solid ${LINE}` }}>
-          <div style={{ padding: '72px 56px 52px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, borderBottom: `1px solid ${LINE}`, alignItems: 'end' }}>
-            <div>
-              <div className="eyebrow eyebrow-blue reveal r1">How We Work</div>
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 0.88, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
-                Six principles.<br /><span style={{ color: GREEN }}>Non-negotiable.</span>
-              </h2>
-            </div>
-            <p style={{ fontSize: 15, color: MUTED, lineHeight: 1.8 }} className="reveal r3">
-              Six principles that govern every engineering decision, every procurement negotiation, and every platform we ship. Not aspirational. Operational.
-            </p>
-          </div>
-
-          <div className="values-grid" style={{ padding: '0 0' }}>
-            {values.map((val, idx) => (
-              <div key={val.num} className="value-card reveal" style={{ transitionDelay: `${idx * 0.07}s` }}>
-                <span className="value-num">{val.num}</span>
-                <div className="value-title">{val.title}</div>
-                <p className="value-body">{val.body}</p>
+        {/* Team disciplines */}
+        <section style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)' }}>
+          <div className="container section-tight">
+            <div className="split-7-5" style={{ marginBottom: 36 }}>
+              <div>
+                <span className="eyebrow reveal r1">Team</span>
+                <h2 className="h2 reveal r2" style={{ marginBottom: 0 }}>
+                  Six disciplines.<br /><span className="g">One integrated team.</span>
+                </h2>
               </div>
-            ))}
+              <p className="body-lg reveal r3" style={{ alignSelf: 'end' }}>
+                A compact founding team that covers every layer of the stack in-house — from
+                airframe mechanical through embedded avionics through edge inference to cloud
+                fleet control.
+              </p>
+            </div>
+
+            <div className="cards-auto-sm" style={{ border: '1px solid var(--line)' }}>
+              {teamDisciplines.map((d, i) => (
+                <div key={d.k} className="reveal" style={{ padding: 'clamp(24px, 3vw, 32px)', transitionDelay: `${i * 0.05}s` }}>
+                  <div className="mono" style={{ fontSize: 10, letterSpacing: '0.22em', color: 'var(--accent)', marginBottom: 14 }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+                  <div className="display" style={{ fontSize: 18, fontWeight: 600, marginBottom: 10 }}>
+                    {d.k}
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.7 }}>{d.v}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
+        {/* Timeline */}
+        <section
+          className="section-tight"
+          style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}
+        >
+          <div className="ambient-tr" />
+          <div className="container split-5-5" style={{ position: 'relative' }}>
+            <div>
+              <span className="eyebrow reveal r1">Path to here</span>
+              <h2 className="h2 reveal r2" style={{ marginBottom: 20 }}>
+                Competition team<br />to company.
+              </h2>
+              <p className="body-md reveal r3" style={{ maxWidth: 380 }}>
+                ISRO IROC-U to NIDAR to a registered defence startup — one year, six platforms,
+                zero shortcuts.
+              </p>
+            </div>
 
-        {/* ══════════════════════════════════════════════════════
-            CTA
-        ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: '80px 56px', background: BG3, borderBottom: `1px solid ${LINE}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 40, flexWrap: 'wrap', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 60% 80% at 10% 50%, ${GREEN_DIM} 0%, transparent 65%)`, pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div className="eyebrow reveal r1" style={{ marginBottom: 16 }}>Work with us</div>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(26px, 3.8vw, 52px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
-              We are open to defence, government,<br />and enterprise conversations.
-            </h2>
-          </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', position: 'relative', zIndex: 1 }} className="reveal r3">
-            <Link href="/partner" className="btn-primary">Get in Touch <span className="arr">→</span></Link>
-            <Link href="/capabilities" className="btn-outline">View Capabilities</Link>
-            <Link href="/systems" className="btn-outline">All Platforms</Link>
+            <ol style={{ listStyle: 'none' }}>
+              {timeline.map((item, idx) => (
+                <li
+                  key={item.year}
+                  className="row-2col-year reveal"
+                  style={{
+                    padding: '24px 0',
+                    borderBottom: '1px solid var(--line)',
+                    transitionDelay: `${idx * 0.05}s`,
+                  }}
+                >
+                  <div
+                    className="mono"
+                    style={{ fontSize: 11, color: 'var(--accent)', letterSpacing: '0.12em', paddingTop: 4 }}
+                  >
+                    {item.year}
+                  </div>
+                  <div>
+                    <div className="display" style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>
+                      {item.title}
+                    </div>
+                    <p style={{ fontSize: 13.5, color: 'var(--sub)', lineHeight: 1.7, marginBottom: 0 }}>
+                      {item.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
+        {/* Values — operating principles */}
+        <section style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)' }}>
+          <div className="container section-tight">
+            <div className="split-7-5" style={{ marginBottom: 36 }}>
+              <div>
+                <span className="eyebrow eyebrow-blue reveal r1">How we work</span>
+                <h2 className="h2 reveal r2" style={{ marginBottom: 0 }}>
+                  Six principles.<br /><span className="g">Non-negotiable.</span>
+                </h2>
+              </div>
+              <p className="body-lg reveal r3" style={{ alignSelf: 'end' }}>
+                Operational commitments we can show you in code, BOMs, and flight logs — not slide
+                decks.
+              </p>
+            </div>
+
+            <div className="cards-auto-sm" style={{ border: '1px solid var(--line)' }}>
+              {values.map((v, i) => (
+                <div
+                  key={v.num}
+                  className="reveal"
+                  style={{
+                    padding: 'clamp(26px, 3vw, 36px)',
+                    borderTop: `2px solid ${i === 0 ? 'var(--accent)' : 'transparent'}`,
+                    transitionDelay: `${i * 0.05}s`,
+                  }}
+                >
+                  <div className="mono" style={{ fontSize: 10, letterSpacing: '0.22em', color: 'var(--muted)', marginBottom: 20 }}>
+                    {v.num}
+                  </div>
+                  <div className="display" style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>
+                    {v.title}
+                  </div>
+                  <p style={{ fontSize: 13.5, color: 'var(--sub)', lineHeight: 1.7 }}>{v.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section
+          className="section-tight"
+          style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}
+        >
+          <div className="ambient-tl" />
+          <div className="container cta-band" style={{ position: 'relative' }}>
+            <div>
+              <span className="eyebrow reveal r1">Work with us</span>
+              <h2 className="h2 reveal r2" style={{ fontSize: 'clamp(26px, 4vw, 48px)' }}>
+                Defence · Government · Enterprise.
+              </h2>
+              <p className="body-md reveal r3" style={{ marginTop: 10, marginBottom: 0, maxWidth: 520 }}>
+                One briefing covers procurement path, platform fit, and timelines.
+              </p>
+            </div>
+            <div className="reveal r3" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link href="/partner#contact-form" className="btn-primary">Get in Touch <span className="arr">→</span></Link>
+              <Link href="/partner/one-pager" className="btn-outline">One-Pager</Link>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

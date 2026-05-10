@@ -1,117 +1,185 @@
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import CustomCursor from '@/components/CustomCursor';
 import RevealObserver from '@/components/RevealObserver';
 import IntelStrip from '@/components/IntelStrip';
 import Link from 'next/link';
 import { systems } from '@/data';
 
+export const metadata = {
+  title: 'Systems — Six autonomous platforms',
+  description:
+    'Six autonomous UAV platforms across defence, enterprise, and agriculture. TRL 6. Indigenous supply chains. Zero Chinese components.',
+};
+
 export default function SystemsPage() {
   return (
     <>
-      <CustomCursor />
       <Nav />
       <RevealObserver />
 
-      <main className="pt-nav">
+      <main id="main" className="pt-nav">
         {/* HERO */}
-        <div className="systems-hero">
-          <div>
-            <div className="eyebrow reveal r1">Platform Portfolio</div>
-            <h1 className="h1 reveal r2">
-              Every mission<br /><span className="g">covered.</span>
-            </h1>
-          </div>
-          <div className="reveal r3">
-            <p className="body-lg" style={{ marginBottom: 28 }}>
-              Six autonomous platforms across defense, enterprise, and agriculture — all built, integrated, and software-managed by Vortex. Indigenous supply chains. No Chinese components.
-            </p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <span className="tag tag-green">TRL 6 · All Platforms</span>
-              <span className="tag">Tethered variants available</span>
-              <span className="tag tag-blue">Cloud-managed</span>
+        <section
+          className="section-tight"
+          style={{ borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}
+        >
+          <div className="ambient-tl" />
+          <div className="container split-7-5" style={{ position: 'relative' }}>
+            <div>
+              <span className="eyebrow reveal r1">Platform Portfolio</span>
+              <h1 className="display h1 reveal r2">
+                Every mission<br /><span className="g">covered.</span>
+              </h1>
+            </div>
+            <div className="reveal r3" style={{ alignSelf: 'end' }}>
+              <p className="body-lg" style={{ marginBottom: 20 }}>
+                Six autonomous platforms — defence, enterprise, agriculture. Built, integrated,
+                and software-managed by Vortex. TRL 6 across the board.
+              </p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span className="tag tag-green">TRL 6 · All Platforms</span>
+                <span className="tag">Tethered variants</span>
+                <span className="tag tag-blue">Cloud-managed</span>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* SYSTEMS GRID */}
-        <div className="systems-grid">
-          {systems.map((sys, idx) => (
-            <Link
-              key={sys.id}
-              href={`/systems/${sys.id}`}
-              style={{ textDecoration: 'none', display: 'block' }}
-            >
-              <div
-                className={`system-row${sys.featured ? ' featured' : ''} reveal`}
-                style={{ transitionDelay: `${idx * 0.07}s` }}
+        {/* Systems rows */}
+        <section style={{ background: 'var(--bg)' }}>
+          <div className="container">
+            {systems.map((sys, idx) => (
+              <Link
+                key={sys.id}
+                href={`/systems/${sys.id}`}
+                className="row-3col reveal"
+                style={{
+                  borderTop: idx === 0 ? '1px solid var(--line)' : 'none',
+                  borderBottom: '1px solid var(--line)',
+                  padding: 'clamp(24px, 3vw, 40px) 0',
+                  transitionDelay: `${idx * 0.05}s`,
+                  textDecoration: 'none',
+                }}
               >
-                <div className="sys-num">{sys.num}</div>
-                <div className="sys-main">
-                  <span
-                    className="sys-cat"
-                    style={sys.featured ? { color: 'var(--green)' } : undefined}
+                {/* num */}
+                <div
+                  className="mono"
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: '0.22em',
+                    color: sys.featured ? 'var(--danger)' : 'var(--muted)',
+                    paddingTop: 6,
+                  }}
+                >
+                  {sys.num}
+                </div>
+
+                {/* main */}
+                <div style={{ paddingRight: 'clamp(0px, 3vw, 48px)', minWidth: 0 }}>
+                  <div
+                    className="mono"
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: sys.featured ? 'var(--danger)' : 'var(--muted)',
+                      marginBottom: 12,
+                    }}
                   >
                     {sys.category}
-                  </span>
-                  <div className="sys-name">{sys.name}</div>
-                  <span
-                    className="sys-variant"
-                    style={sys.featured ? { color: '#FF5533' } : undefined}
+                  </div>
+                  <h2
+                    className="display"
+                    style={{
+                      fontSize: 'clamp(28px, 4.5vw, 56px)',
+                      lineHeight: 0.95,
+                      marginBottom: 6,
+                      color: sys.featured ? 'transparent' : 'var(--text)',
+                      WebkitTextStroke: sys.featured ? '1px var(--accent)' : 'none',
+                    }}
                   >
-                    {sys.featured ? `MUNITION VARIANT · ${sys.num} · RESTRICTED` : sys.keySpec}
-                  </span>
-                  <p className="sys-desc">{sys.desc}</p>
-                  <div className="sys-tags">
-                    {sys.id === 'vas02' ? (
-                      <span className="tag" style={{ borderColor: 'rgba(255,184,48,0.3)', color: '#FFB830' }}>{sys.tagLabel}</span>
-                    ) : (
-                      <span className={`tag ${sys.tagType === 'tag-green' ? 'tag-green' : sys.tagType === 'tag-blue' ? 'tag-blue' : ''}`}>{sys.tagLabel}</span>
-                    )}
+                    {sys.name}
+                  </h2>
+                  <div
+                    className="mono"
+                    style={{
+                      fontSize: 11,
+                      color: sys.featured ? 'var(--danger)' : 'var(--accent)',
+                      letterSpacing: '0.08em',
+                      marginBottom: 16,
+                    }}
+                  >
+                    {sys.featured
+                      ? `RESTRICTED · ${sys.num}`
+                      : sys.keySpec}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      color: 'var(--sub)',
+                      lineHeight: 1.72,
+                      maxWidth: 620,
+                      marginBottom: 16,
+                    }}
+                  >
+                    {sys.desc}
+                  </p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <span className={`tag ${sys.tagType}`}>{sys.tagLabel}</span>
                     {sys.tagExtra?.slice(0, 2).map((t) => (
-                      <span key={t.label} className="tag">{t.label}</span>
+                      <span key={t.label} className="tag">
+                        {t.label}
+                      </span>
                     ))}
                   </div>
                 </div>
-                <div className="sys-specs">
-                  {sys.specs.slice(0, 5).map((spec) => (
-                    <div key={spec.k} className="spec-line">
-                      <span className="spec-k">{spec.k}</span>
-                      <span className="spec-v">{spec.v}</span>
-                    </div>
-                  ))}
-                  <div className="spec-line" style={{ marginTop: 'auto', paddingTop: 12 }}>
-                    <span className="spec-k" />
-                    <span className="spec-v" style={{ color: 'var(--green)' }}>View details →</span>
+
+                {/* specs (hidden <1024) */}
+                <div className="row-3col-specs">
+                  <div className="spec-table">
+                    {sys.specs.slice(0, 5).map((spec) => (
+                      <div key={spec.k} className="spec-line">
+                        <span className="spec-k">{spec.k}</span>
+                        <span className="spec-v">{spec.v}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    className="mono"
+                    style={{
+                      marginTop: 16,
+                      fontSize: 11,
+                      color: 'var(--accent)',
+                      letterSpacing: '0.15em',
+                      textAlign: 'right',
+                    }}
+                  >
+                    View details →
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* FOOTER CTA */}
-        <div style={{
-          padding: '60px 56px 80px',
-          borderTop: '1px solid var(--line)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 24,
-        }}>
-          <div>
-            <p className="eyebrow" style={{ marginBottom: 8 }}>
-              All systems at TRL 6. Tethered variants of Sentinel and Ranger available.
-            </p>
-            <p className="body-md" style={{ maxWidth: 500 }}>
-              Defense platforms operate under MoD exemption — no DGCA Type Certification required for military procurement and trials.
-            </p>
+              </Link>
+            ))}
           </div>
-          <Link href="/partner" className="btn-primary">
-            Request System Briefing <span className="arr">→</span>
-          </Link>
-        </div>
+        </section>
+
+        {/* CTA */}
+        <section
+          className="section-tight"
+          style={{ borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}
+        >
+          <div className="container cta-band">
+            <div style={{ maxWidth: 520 }}>
+              <span className="eyebrow reveal r1">Procurement note</span>
+              <p className="body-lg reveal r2" style={{ marginBottom: 0 }}>
+                Defence platforms operate under MoD exemption — no DGCA Type Certification
+                required for military procurement and trials.
+              </p>
+            </div>
+            <Link href="/partner#contact-form" className="btn-primary reveal r3">
+              Request System Briefing <span className="arr">→</span>
+            </Link>
+          </div>
+        </section>
 
         <IntelStrip />
       </main>
