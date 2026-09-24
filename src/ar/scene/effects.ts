@@ -27,6 +27,7 @@ import {
   SphereGeometry,
   Vector3,
 } from 'three';
+import { CLIMB_STREAKS } from '../core/stage.ts';
 import type { LockOnTargetState, SurveyGrid, TargetKind } from '../core/missions.ts';
 import { LIME } from './drone';
 
@@ -551,13 +552,15 @@ export class ClimbStreaks {
   private strength = 0;
   private target = 0;
 
-  constructor() {
+  /** `reach`: drone centre to prop tip; the streaks fall in a ring just outside it. */
+  constructor(reach: number) {
     const pos = new Float32Array(this.count * 6);
     this.seeds = new Float32Array(this.count * 3);
+    const S = CLIMB_STREAKS;
     for (let i = 0; i < this.count; i++) {
       const a = Math.random() * Math.PI * 2;
-      const r = 0.5 + Math.random() * 1.4;
-      this.seeds.set([Math.cos(a) * r, Math.random() * 3, Math.sin(a) * r], i * 3);
+      const r = reach * (S.inner + Math.random() * (S.outer - S.inner));
+      this.seeds.set([Math.cos(a) * r, -S.below + Math.random() * (S.above + S.below), Math.sin(a) * r], i * 3);
     }
     const g = new BufferGeometry();
     g.setAttribute('position', new BufferAttribute(pos, 3));
@@ -583,13 +586,14 @@ export class ClimbStreaks {
     const attr = this.lines.geometry.attributes.position as BufferAttribute;
     const arr = attr.array as Float32Array;
     for (let i = 0; i < this.count; i++) {
+      const S = CLIMB_STREAKS;
       let y = this.seeds[i * 3 + 1] - dt * 3.2;
-      if (y < -1.5) y += 3;
+      if (y < -S.below) y += S.above + S.below;
       this.seeds[i * 3 + 1] = y;
       const x = centre.x + this.seeds[i * 3];
       const z = centre.z + this.seeds[i * 3 + 2];
       const yy = centre.y + y;
-      arr.set([x, yy, z, x, yy + 0.1, z], i * 6);
+      arr.set([x, yy, z, x, yy + S.length, z], i * 6);
     }
     attr.needsUpdate = true;
     (this.lines.material as LineBasicMaterial).opacity = 0.22 * this.strength;
@@ -605,8 +609,14 @@ export class FeaturePoints {
   private target = 0;
   private t = 0;
 
-  /** `standee` null (floor mode, no standee): scatter points on the floor only. */
-  constructor(standee: { size: [number, number]; centreY: number } | null) {
+  /**
+   * `standee` null (floor mode, no standee): scatter points on the floor only. Floor points stay
+   * within `floor` (the intro stage in front of the standee).
+   */
+  constructor(
+    standee: { size: [number, number]; centreY: number } | null,
+    floor: { minX: number; maxX: number; minZ: number; maxZ: number },
+  ) {
     const n = 220;
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
@@ -616,7 +626,10 @@ export class FeaturePoints {
           i * 3,
         );
       } else {
-        pos.set([(Math.random() - 0.5) * 5, 0.005, Math.random() * 4], i * 3);
+        pos.set(
+          [floor.minX + Math.random() * (floor.maxX - floor.minX), 0.005, floor.minZ + Math.random() * (floor.maxZ - floor.minZ)],
+          i * 3,
+        );
       }
     }
     this.base = new Float32Array(n * 3).fill(1);

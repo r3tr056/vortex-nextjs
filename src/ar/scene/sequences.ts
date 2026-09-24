@@ -1,5 +1,6 @@
-// Scripted ~40 s ad sequences, one per drone. Positions are booth space (metres); the stage is
-// the ~3 × 1.5 m of floor between the standee and a visitor scanning it.
+// Scripted ~40 s ad sequences, one per drone. Positions are in the intro's own space (metres,
+// booth axes, drone at real size). The world shrinks the whole experience uniformly to fit the
+// stage in front of the standee (core/stage.ts: INTRO_STAGE) and keeps that scale afterwards.
 //
 // Copy mirrors docs/ar-experience-brief.md — edit both together.
 
@@ -43,7 +44,15 @@ export interface SequenceScript {
   cues: Cue[];
   /** Ground targets classified during the Track beat (Sentinel). */
   demoTargets?: { id: string; kind: 'vehicle' | 'person' | 'radar'; label: string; x: number; z: number; confidence: string }[];
+  /** When the fleet wingmen fly (they count toward the stage fit). */
+  ghosts?: [number, number];
+  /** When the climb streaks show. */
+  streaks?: [number, number];
 }
+
+const CLIMB: [number, number] = [10, 18.5];
+// Wingmen join once the drone has turned to face the visitor (so they don't sweep the booth).
+const FLEET: [number, number] = [29.2, 34.5];
 
 const HANDOVER: PathKey[] = [
   { t: 37.5, p: [0, 1.2, 1.1], yaw: Math.PI },
@@ -52,21 +61,22 @@ const HANDOVER: PathKey[] = [
 
 const sentinel: SequenceScript = {
   duration: 40,
+  streaks: CLIMB,
   demoTargets: [
-    { id: 'd1', kind: 'vehicle', label: 'Vehicle', x: -0.8, z: 1.2, confidence: '0.94' },
-    { id: 'd2', kind: 'person', label: 'Person', x: 0.3, z: 1.6, confidence: '0.91' },
-    { id: 'd3', kind: 'vehicle', label: 'Vehicle', x: 1.0, z: 0.8, confidence: '0.88' },
+    { id: 'd1', kind: 'vehicle', label: 'Vehicle', x: -0.85, z: 1.25, confidence: '0.94' },
+    { id: 'd2', kind: 'person', label: 'Person', x: 0.1, z: 1.5, confidence: '0.91' },
+    { id: 'd3', kind: 'vehicle', label: 'Vehicle', x: 0.85, z: 0.9, confidence: '0.88' },
   ],
   path: [
     { t: 0, p: [0, 0, 0.9], yaw: 0 },
     { t: 6.5, p: [0, 0, 0.9], yaw: 0 },
-    { t: 10, p: [0, 1.1, 1.0], yaw: 0 },
-    { t: 17.5, p: [0.15, 2.2, 0.9], yaw: 0.9 },
-    { t: 20, p: [-0.3, 1.7, 1.15], yaw: 0.3 },
-    { t: 23, p: [0.1, 1.7, 1.35], yaw: 0 },
-    { t: 26.5, p: [0.5, 1.6, 1.1], yaw: -0.4 },
-    { t: 30, p: [0.9, 1.5, 0.7], yaw: -1.3 },
-    { t: 33, p: [0.2, 1.4, 0.6], yaw: -0.2 },
+    { t: 10, p: [0, 1.1, 0.95], yaw: 0 },
+    { t: 17.5, p: [0.05, 2.0, 0.95], yaw: 0.9 },
+    { t: 20, p: [-0.35, 1.65, 1.1], yaw: 0.3 },
+    { t: 23, p: [0.05, 1.65, 1.2], yaw: 0 },
+    { t: 26.5, p: [0.4, 1.55, 1.05], yaw: -0.4 },
+    { t: 30, p: [0.45, 1.45, 0.9], yaw: -1.3 },
+    { t: 33, p: [0.05, 1.4, 0.9], yaw: -0.2 },
     ...HANDOVER,
   ],
   cues: [
@@ -76,8 +86,8 @@ const sentinel: SequenceScript = {
     { t: 5, run: (fx) => fx.rpm(0.35, 1) },
     { t: 6.2, run: (fx) => { fx.rpm(0.9, 1.4); fx.pad(false); } },
     { t: 7.5, run: (fx) => fx.callout('deploy', 'Man-portable', 'Carried and launched by one operator', 'drone', 'right') },
-    { t: 10, run: (fx) => { fx.hideCallout('deploy'); fx.caption('03', 'Climb', 'Rated above 5,000 m. Built for Ladakh-class ceilings.'); fx.altitude(0, 5000, 7); fx.climbStreaks(true); fx.sound('beat'); } },
-    { t: 17.5, run: (fx) => fx.climbStreaks(false) },
+    { t: CLIMB[0], run: (fx) => { fx.hideCallout('deploy'); fx.caption('03', 'Climb', 'Rated above 5,000 m. Built for Ladakh-class ceilings.'); fx.altitude(0, 5000, 7); fx.climbStreaks(true); fx.sound('beat'); } },
+    { t: CLIMB[1] - 1, run: (fx) => fx.climbStreaks(false) },
     { t: 18.5, run: (fx) => { fx.hideAltitude(); fx.caption('04', 'Track', 'Onboard AI finds and classifies targets. No ground station needed.'); fx.demoTargets(true); fx.gimbal(true); fx.gimbalLook(0); fx.sound('beat'); } },
     { t: 20, run: (fx) => { fx.callout('c0', 'Vehicle', 'Confidence 0.94', { target: 0 }, 'left'); fx.sound('lock'); } },
     { t: 22.5, run: (fx) => fx.gimbalLook(1) },
@@ -94,26 +104,27 @@ const sentinel: SequenceScript = {
 
 const ranger: SequenceScript = {
   duration: 40,
+  ghosts: FLEET,
   path: [
     { t: 0, p: [0, 0, 0.9], yaw: 0 },
     { t: 6.5, p: [0, 0, 0.9], yaw: 0 },
     { t: 9.5, p: [0, 1.3, 1.0], yaw: 0 },
     // Lawnmower survey: three passes across the zone.
-    { t: 10.8, p: [-1.2, 1.35, 0.6], yaw: Math.PI / 2 },
-    { t: 12.8, p: [1.2, 1.35, 0.6], yaw: Math.PI / 2 },
-    { t: 13.6, p: [1.2, 1.35, 1.05], yaw: -Math.PI / 2 },
-    { t: 15.6, p: [-1.2, 1.35, 1.05], yaw: -Math.PI / 2 },
-    { t: 16.4, p: [-1.2, 1.35, 1.5], yaw: Math.PI / 2 },
-    { t: 18.4, p: [1.2, 1.35, 1.5], yaw: Math.PI / 2 },
+    { t: 10.8, p: [-0.7, 1.35, 0.8], yaw: Math.PI / 2 },
+    { t: 12.8, p: [0.7, 1.35, 0.8], yaw: Math.PI / 2 },
+    { t: 13.6, p: [0.7, 1.35, 1.1], yaw: -Math.PI / 2 },
+    { t: 15.6, p: [-0.7, 1.35, 1.1], yaw: -Math.PI / 2 },
+    { t: 16.4, p: [-0.7, 1.35, 1.4], yaw: Math.PI / 2 },
+    { t: 18.4, p: [0.7, 1.35, 1.4], yaw: Math.PI / 2 },
     // Orbit the rising digital twin.
-    { t: 20.5, p: [0.9, 1.9, 1.05], yaw: -Math.PI / 2 },
-    { t: 22.8, p: [0, 1.95, 1.9], yaw: Math.PI },
-    { t: 25, p: [-0.9, 1.9, 1.05], yaw: Math.PI / 2 },
-    { t: 27.5, p: [-0.2, 1.7, 1.4], yaw: 2.6 },
-    // Fleet.
-    { t: 29.5, p: [0, 1.6, 1.1], yaw: 0 },
-    { t: 32, p: [0.4, 1.8, 0.9], yaw: -0.5 },
-    { t: 34, p: [0, 1.5, 1.0], yaw: 0 },
+    { t: 20.5, p: [0.7, 1.75, 1.1], yaw: -Math.PI / 2 },
+    { t: 22.8, p: [0, 1.8, 1.4], yaw: Math.PI },
+    { t: 25, p: [-0.7, 1.75, 1.1], yaw: Math.PI / 2 },
+    { t: 27.5, p: [-0.15, 1.6, 1.2], yaw: 2.6 },
+    // Fleet: a gentle bank, far enough forward that the wingmen stay in front of the standee.
+    { t: 29.5, p: [0, 1.55, 1.2], yaw: 0 },
+    { t: 32, p: [0.1, 1.65, 1.15], yaw: -0.15 },
+    { t: 34, p: [0, 1.5, 1.15], yaw: 0 },
     ...HANDOVER,
   ],
   cues: [
@@ -129,9 +140,9 @@ const ranger: SequenceScript = {
     { t: 19.6, run: (fx) => fx.surveyTiles(false) },
     { t: 21, run: (fx) => fx.callout('twin', 'Digital twin', 'Geospatial intelligence from one flight', [0.6, 0.45, 1.05], 'left') },
     { t: 27, run: (fx) => { fx.hideCallout('twin'); fx.terrain(false); } },
-    { t: 27.5, run: (fx) => { fx.caption('05', 'Fleet', 'One operator, many aircraft. Vortex Cloud GCS.'); fx.ghosts(true); fx.sound('beat'); } },
-    { t: 29, run: (fx) => fx.callout('fleet', 'Multi-fleet coordination', 'Vortex FlightControl · tethered option', 'drone', 'right') },
-    { t: 33.5, run: (fx) => { fx.ghosts(false); fx.hideCallout('fleet'); } },
+    { t: 27.5, run: (fx) => { fx.caption('05', 'Fleet', 'One operator, many aircraft. Vortex Cloud GCS.'); fx.sound('beat'); } },
+    { t: FLEET[0], run: (fx) => { fx.ghosts(true); fx.callout('fleet', 'Multi-fleet coordination', 'Vortex FlightControl · tethered option', 'drone', 'right'); } },
+    { t: FLEET[1] - 1, run: (fx) => { fx.ghosts(false); fx.hideCallout('fleet'); } },
     { t: 35, run: (fx) => { fx.caption('06', 'Your turn', 'Take the sticks.'); fx.pad(true); fx.sound('beat'); } },
   ],
 };

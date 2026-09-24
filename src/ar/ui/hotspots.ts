@@ -18,6 +18,17 @@ interface Entry {
 
 const tmp = new Vector3();
 const toCam = new Vector3();
+/** Minimum centre-to-centre spacing on screen (px), so neighbouring buttons stay tappable. */
+const MIN_GAP = 46;
+
+interface Placed {
+  el: HTMLElement;
+  x: number;
+  y: number;
+  s: number;
+  hidden: boolean;
+}
+const placed: Placed[] = [];
 
 export class HotspotLayer {
   private readonly entries = new Map<string, Entry>();
@@ -67,17 +78,48 @@ export class HotspotLayer {
   update(camera: PerspectiveCamera, width: number, height: number) {
     if (!this.visible) return;
     camera.getWorldPosition(toCam);
+    placed.length = 0;
     for (const { item, el } of this.entries.values()) {
       item.resolve(tmp);
       const dist = tmp.distanceTo(toCam);
       tmp.project(camera);
-      const offscreen = !(Math.abs(tmp.z) <= 1) || Math.abs(tmp.x) > 1.1 || Math.abs(tmp.y) > 1.1;
-      const x = (tmp.x * 0.5 + 0.5) * width;
-      const y = (-tmp.y * 0.5 + 0.5) * height;
-      // Slightly smaller when far away, never below a comfortable tap size.
-      const s = Math.max(0.8, Math.min(1.15, 1.4 - dist * 0.25));
-      el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${s.toFixed(2)})`;
-      el.style.visibility = offscreen ? 'hidden' : 'visible';
+      placed.push({
+        el,
+        x: (tmp.x * 0.5 + 0.5) * width,
+        y: (-tmp.y * 0.5 + 0.5) * height,
+        // Slightly smaller when far away, never below a comfortable tap size.
+        s: Math.max(0.8, Math.min(1.15, 1.4 - dist * 0.25)),
+        hidden: !(Math.abs(tmp.z) <= 1) || Math.abs(tmp.x) > 1.1 || Math.abs(tmp.y) > 1.1,
+      });
+    }
+    // The drone is a scale model, so parts sit close together on screen: nudge overlapping
+    // buttons apart (recomputed from the true positions every frame, so nothing drifts).
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 0; i < placed.length; i++) {
+        for (let j = i + 1; j < placed.length; j++) {
+          const a = placed[i];
+          const b = placed[j];
+          if (a.hidden || b.hidden) continue;
+          let dx = b.x - a.x;
+          let dy = b.y - a.y;
+          let d = Math.hypot(dx, dy);
+          if (d >= MIN_GAP) continue;
+          if (d < 0.01) {
+            dx = 1;
+            dy = 0;
+            d = 1;
+          }
+          const push = (MIN_GAP - d) / 2;
+          a.x -= (dx / d) * push;
+          a.y -= (dy / d) * push;
+          b.x += (dx / d) * push;
+          b.y += (dy / d) * push;
+        }
+      }
+    }
+    for (const p of placed) {
+      p.el.style.transform = `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) scale(${p.s.toFixed(2)})`;
+      p.el.style.visibility = p.hidden ? 'hidden' : 'visible';
     }
   }
 

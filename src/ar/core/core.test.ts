@@ -162,3 +162,55 @@ test('samplePath reports zero velocity across a zero-length span', () => {
   const s = samplePath(keys, 1);
   assert.ok(Number.isFinite(s.vx) && Number.isFinite(s.vy) && Number.isFinite(s.vz));
 });
+
+test('each intro fits the stage around the standee, with the drone at least half size', async () => {
+  const { SEQUENCES } = await import('../scene/sequences.ts');
+  const { SURVEY_REGION } = await import('./missions.ts');
+  const { INTRO_STAGE, applyFit, fitStage, introExtent } = await import('./stage.ts');
+  // Reach = centre to prop tip (config: diagonal / 2 + prop diameter / 2); height from the models.
+  const drones = {
+    sentinel: { reach: 0.95 / 2 + 0.56 / 2, height: 0.42, extra: [] },
+    ranger: { reach: 0.85 / 2 + 0.48 / 2, height: 0.45, extra: [{ ...SURVEY_REGION, maxY: 0.6 }] },
+  };
+  for (const [slug, d] of Object.entries(drones) as [keyof typeof drones, (typeof drones)['ranger']][]) {
+    const content = introExtent(SEQUENCES[slug], d, d.extra);
+    const fit = fitStage(content);
+    const placed = applyFit(content, fit);
+    const eps = 1e-6;
+    assert.ok(placed.minX >= INTRO_STAGE.minX - eps && placed.maxX <= INTRO_STAGE.maxX + eps, `${slug} width`);
+    assert.ok(placed.maxY <= INTRO_STAGE.maxY + eps, `${slug} height`);
+    assert.ok(placed.minZ >= INTRO_STAGE.minZ - eps && placed.maxZ <= INTRO_STAGE.maxZ + eps, `${slug} depth`);
+    assert.ok(fit.scale >= 0.5, `${slug} scale ${fit.scale.toFixed(2)} is too small to read`);
+  }
+});
+
+test('the play zone keeps flying, Explore and the missions in front of the standee', async () => {
+  const { SEQUENCES } = await import('../scene/sequences.ts');
+  const { LOCKON_TARGETS, SURVEY_REGION, nadirFootprint } = await import('./missions.ts');
+  const { fitStage, introExtent, playBounds, toStage } = await import('./stage.ts');
+  const drones = {
+    sentinel: { reach: 0.95 / 2 + 0.56 / 2, height: 0.42, extra: [] },
+    ranger: { reach: 0.85 / 2 + 0.48 / 2, height: 0.45, extra: [{ ...SURVEY_REGION, maxY: 0.6 }] },
+  };
+  for (const [slug, d] of Object.entries(drones) as [keyof typeof drones, (typeof drones)['ranger']][]) {
+    const fit = fitStage(introExtent(SEQUENCES[slug], d, d.extra));
+    const b = playBounds(fit, d);
+    // Room to actually fly: at least a drone's width of travel each way (stage space).
+    assert.ok(b.maxX - b.minX >= 2 * d.reach, `${slug} play width ${(b.maxX - b.minX).toFixed(2)}`);
+    assert.ok(b.maxZ - b.minZ >= d.reach, `${slug} play depth ${(b.maxZ - b.minZ).toFixed(2)}`);
+    assert.ok(b.maxY >= 1.2, `${slug} play ceiling ${b.maxY.toFixed(2)}`);
+    // Explore hover spot (same booth-space point the world uses).
+    const [ex, ey, ez] = toStage(fit, 0, 0.95, 0.8);
+    assert.ok(ex >= b.minX && ex <= b.maxX && ez >= b.minZ && ez <= b.maxZ && ey <= b.maxY, `${slug} explore spot`);
+    if (slug === 'sentinel') {
+      for (const t of LOCKON_TARGETS) {
+        assert.ok(t.x >= b.minX && t.x <= b.maxX && t.z >= b.minZ && t.z <= b.maxZ, `lock-on target ${t.id} out of reach`);
+      }
+    } else {
+      // Every edge of the survey zone is reachable by the nadir footprint from inside the bounds.
+      const r = nadirFootprint(0, 1.35, 0).r;
+      assert.ok(SURVEY_REGION.minX >= b.minX - r && SURVEY_REGION.maxX <= b.maxX + r, 'survey width');
+      assert.ok(SURVEY_REGION.minZ >= b.minZ - r && SURVEY_REGION.maxZ <= b.maxZ + r, 'survey depth');
+    }
+  }
+});

@@ -60,13 +60,22 @@ downloading while the visitor reads the intro screen.
 
 ## Ad sequence scripts (draft — for approval)
 
+**Footprint (congested halls):** the whole experience plays as a scale model in front of the
+standee. The intro fits the 75 cm standee plus ~50 cm each side (1.75 m wide), below 1.6 m (the
+standee is 1.8 m) and within 1.3 m in front of it (`INTRO_STAGE` in `src/ar/core/stage.ts`). The
+scale is computed from the choreography so everything (drone with props, targets, survey grid,
+twin, fleet) fits: about 0.6× for Sentinel and 0.55× for Ranger. The drone keeps that size for
+Explore, flight and the missions, which stay in the same zone (reaching 1.5 m in front, where the
+visitor stands; `PLAY_STAGE`). Unit tests fail if an edit pushes the intro outside the stage,
+below 0.5×, or puts Explore / mission targets out of reach.
+
 ### Sentinel — "Eyes above 5,000 m" (~40 s)
 1. **Lock** (0–4 s): lime scan line sweeps the standee; HUD tag `SENTINEL · VAS-04` locks on.
 2. **Deploy** (4–10 s): drone resolves wireframe → solid at the standee base, props spin up, vertical take-off. Callout: *Man-portable · rapid deploy*.
 3. **Climb** (10–18 s): altitude counter runs up to **5,000 m+**; *Ladakh-class ceilings*.
 4. **Track** (18–28 s): gimbal cone projects onto the floor; three holographic ground targets appear and get classified with AI boxes. Callout: *Onboard AI target tracking — no ground-station dependency*.
 5. **Deny** (28–35 s): GNSS icon struck through, `GPS DENIED`; drone holds course. Callouts: *GPS-denied navigation · Low-signature*.
-6. **Handover** (35–40 s): drone returns to hover in front of the visitor → "Your turn".
+6. **Handover** (35–40 s): drone hovers in front of the visitor → "Your turn — Take the sticks."
 
 **Mission — Lock-on:** three targets hidden around the booth. Fly the camera cone over each and hold 2 s to lock. Timer + result card → CTA.
 
@@ -75,8 +84,8 @@ downloading while the visitor reads the intro screen.
 2. **Launch** (4–10 s): take-off. Callout: *Long-endurance mapping & persistent ISR*.
 3. **Survey** (10–20 s): lawnmower pass in front of the booth; the floor paints into a survey tile grid as it flies. Callout: *RGB / multispectral / LiDAR → survey-grade maps*.
 4. **Twin** (20–30 s): a miniature terrain digital twin rises out of the grid. Callout: *Vortex Enterprise — digital twin & geospatial intelligence*.
-5. **Fleet** (30–35 s): two ghost drones join in formation. Callout: *Multi-fleet coordination · Vortex FlightControl · tethered option*.
-6. **Handover** (35–40 s): "Your turn".
+5. **Fleet** (27.5–34 s): two ghost drones join in formation once the drone has turned to face the visitor. Callout: *Multi-fleet coordination · Vortex FlightControl · tethered option*.
+6. **Handover** (35–40 s): "Your turn — Take the sticks."
 
 **Mission — Survey the zone:** paint a 2.7 × 1.2 m floor grid to 90% in 60 s. Cells only count on steady passes under 1 m/s at 0.5–2.6 m altitude (a first playtest mapped it in 9 s, so it now rewards careful flying) → coverage % result card → CTA.
 

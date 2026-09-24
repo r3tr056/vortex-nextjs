@@ -61,9 +61,10 @@ export type MissionEvent =
   | { type: 'complete'; success: boolean };
 
 export const LOCKON_TARGETS: LockOnTargetDef[] = [
-  { id: 't1', kind: 'vehicle', label: 'Vehicle', x: -1.9, z: 0.7 },
-  { id: 't2', kind: 'radar', label: 'Radar', x: 1.8, z: 1.2 },
-  { id: 't3', kind: 'person', label: 'Person', x: 0.4, z: 1.9 },
+  // Stage space: inside the play zone in front of the standee (see core/stage.ts).
+  { id: 't1', kind: 'vehicle', label: 'Vehicle', x: -0.9, z: 1.0 },
+  { id: 't2', kind: 'radar', label: 'Radar', x: 1.0, z: 1.5 },
+  { id: 't3', kind: 'person', label: 'Person', x: 0.1, z: 2.1 },
 ];
 
 export class LockOnMission {

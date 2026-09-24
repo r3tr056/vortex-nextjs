@@ -27,7 +27,7 @@ import {
   type BoothPose,
   type FilterResult,
 } from '../core/anchor.ts';
-import { FlightModel, headingVectors, type Sticks } from '../core/flight.ts';
+import { DEFAULT_FLIGHT_PARAMS, FlightModel, headingVectors, type Sticks } from '../core/flight.ts';
 import {
   gimbalFootprint,
   LOCKON_TARGETS,
@@ -40,6 +40,7 @@ import {
 } from '../core/missions.ts';
 import type { AnchorMode, ArStore, MissionHud } from '../core/store.ts';
 import { samplePath, type PathSample } from '../core/track.ts';
+import { GHOST_OFFSET, INTRO_STAGE, fitStage, introExtent, playBounds, toStage, type StageFit } from '../core/stage.ts';
 import type { RotorAudio } from '../audio/rotor';
 import type { ImageEvent, LightingEvent, MarkerEvent, SessionHandles } from '../engine/types';
 import type { CalloutLayer } from '../ui/callouts';
@@ -82,7 +83,10 @@ export interface WorldOptions {
 const IDLE_STICKS: Sticks = { lx: 0, ly: 0, rx: 0, ry: 0 };
 const HANDOVER_POS = new Vector3(0, 1.2, 1.1);
 /** Where the drone hovers in Explore: in front of the standee, at chest height. */
-const EXPLORE_POS = new Vector3(0, 1.05, 1.2);
+/** Explore hover spot in booth space: about waist height, ~0.8 m in front of the standee. */
+const EXPLORE_BOOTH: [number, number, number] = [0, 0.95, 0.8];
+/** Flying at model scale in a small zone: a little gentler than the defaults. */
+const PLAY_FLIGHT = { ...DEFAULT_FLIGHT_PARAMS, maxSpeedH: 1.4, maxSpeedV: 0.9 };
 /** A standee is upright; anything leaning more than this is a misdetection. */
 const MAX_TILT = (30 * Math.PI) / 180;
 const DEMO_DURATION: Record<HotspotAction, number> = {
@@ -119,10 +123,19 @@ function kelvinToColor(k: number, out: Color) {
 
 export class ExperienceWorld implements SequenceFx {
   readonly booth = new Group();
+  /**
+   * Holds the drone and everything it interacts with, shrunk uniformly (the scale model) to fit
+   * the stage in front of the standee for the whole experience. Standee-attached effects (the
+   * scan sweep, feature points) stay directly in `booth` at true size.
+   */
+  private readonly stage = new Group();
+  private stageFit: StageFit = { scale: 1, x: 0, z: 0 };
+  private readonly explorePos = new Vector3(0, 1.05, 1.2);
+  private playArea = { minX: -2.8, maxX: 2.8, minZ: -0.4, maxZ: 3.0, maxY: 3.0 };
   private readonly o: WorldOptions;
   private readonly seq: SequenceScript;
   private rig!: DroneRig;
-  private readonly flight = new FlightModel();
+  private flight = new FlightModel();
   private phase: WorldPhase = 'idle';
   private time = 0;
   private mode: AnchorMode;
@@ -233,7 +246,8 @@ export class ExperienceWorld implements SequenceFx {
 
     this.rig = await DroneRig.create({ slug: drone.slug, model: drone.model, onProgress: this.o.onProgress });
     this.rig.root.visible = false;
-    this.booth.add(this.rig.root);
+    this.booth.add(this.stage);
+    this.stage.add(this.rig.root);
     // Installed once; the plane is only moved afterwards. "Reveal all" until materialising.
     this.clipPlane.set(new Vector3(0, -1, 0), 1e5);
     this.rig.installClip(this.clipPlane);
@@ -242,20 +256,13 @@ export class ExperienceWorld implements SequenceFx {
     this.padFx = new PulseRing(drone.model.diagonalM * 0.55);
     this.matRing = new MaterializeRing(drone.model.diagonalM * 0.5);
     this.cone = new SensorCone();
-    this.streaks = new ClimbStreaks();
+    const reach = drone.model.diagonalM / 2 + drone.model.propDiameterM / 2;
+    this.streaks = new ClimbStreaks(reach);
     this.points = this.makeFeaturePoints();
     this.scanSweep = new ScanSweep(1, 1);
     this.tether = new Tether();
-    this.booth.add(
-      this.shadow.mesh,
-      this.padFx.group,
-      this.matRing.mesh,
-      this.cone.group,
-      this.streaks.lines,
-      this.points.points,
-      this.scanSweep.mesh,
-      this.tether.group,
-    );
+    this.stage.add(this.shadow.mesh, this.padFx.group, this.matRing.mesh, this.cone.group, this.streaks.lines, this.tether.group);
+    this.booth.add(this.points.points, this.scanSweep.mesh);
 
     this.xrayGhost = this.rig.createGhost();
     this.xrayGhost.visible = false;
@@ -263,25 +270,36 @@ export class ExperienceWorld implements SequenceFx {
 
     if (this.seq.demoTargets) {
       this.demoTargetsFx = new GroundTargets(this.seq.demoTargets);
-      this.booth.add(this.demoTargetsFx.group);
+      this.stage.add(this.demoTargetsFx.group);
     }
     if (drone.mission === 'lockon') {
       this.missionTargets = new GroundTargets(LOCKON_TARGETS);
       this.exploreTarget = new GroundTargets([{ id: 'x1', kind: 'vehicle', x: 0, z: 1.8 }]);
-      this.booth.add(this.missionTargets.group, this.exploreTarget.group);
+      this.stage.add(this.missionTargets.group, this.exploreTarget.group);
     } else {
       this.grid = new SurveyGrid();
       this.tiles = new SurveyTiles(this.grid);
       this.terrainFx = new TerrainTwin(this.grid.region);
-      this.booth.add(this.tiles.group, this.terrainFx.group);
+      this.stage.add(this.tiles.group, this.terrainFx.group);
     }
     for (const side of [-1, 1]) {
       const g = this.rig.createGhost();
       g.visible = false;
       g.userData.side = side;
       this.ghostRigs.push(g);
-      this.booth.add(g);
+      this.stage.add(g);
     }
+
+    // The intro's scale model: the largest uniform scale at which the drone, its path and every
+    // effect fit the stage around the standee (the survey zone and digital twin rise to ~0.6 m).
+    const zone = this.grid ? [{ ...this.grid.region, maxY: 0.6 }] : [];
+    const size = { reach, height: this.rig.height };
+    this.stageFit = fitStage(introExtent(this.seq, size, zone));
+    this.stage.scale.setScalar(this.stageFit.scale);
+    this.stage.position.set(this.stageFit.x, 0, this.stageFit.z);
+    this.playArea = playBounds(this.stageFit, size);
+    this.flight = new FlightModel(PLAY_FLIGHT, this.playArea);
+    this.explorePos.set(...toStage(this.stageFit, ...EXPLORE_BOOTH));
 
     this.reticle = new Reticle();
     scene.add(this.reticle.group);
@@ -307,7 +325,7 @@ export class ExperienceWorld implements SequenceFx {
   private makeFeaturePoints() {
     const upper = this.o.drone.standee.targets[0];
     // No standee in floor mode, so only scatter points on the floor.
-    return new FeaturePoints(this.mode === 'floor' ? null : { size: upper.sizeM, centreY: upper.centerM[1] });
+    return new FeaturePoints(this.mode === 'floor' ? null : { size: upper.sizeM, centreY: upper.centerM[1] }, INTRO_STAGE);
   }
 
   setAnchorMode(mode: AnchorMode) {
@@ -536,8 +554,8 @@ export class ExperienceWorld implements SequenceFx {
     this.exploreFrom.copy(this.rig.root.position);
     this.exploreT = 0;
     // Turn to face the visitor so the sensor hotspots are in view.
-    const cam = this.booth.worldToLocal(this.o.handles.camera.getWorldPosition(tmpV));
-    this.exploreYaw = Math.atan2(cam.x - EXPLORE_POS.x, cam.z - EXPLORE_POS.z);
+    const cam = this.stage.worldToLocal(this.o.handles.camera.getWorldPosition(tmpV));
+    this.exploreYaw = Math.atan2(cam.x - this.explorePos.x, cam.z - this.explorePos.z);
     this.o.hotspots.show(
       this.o.drone.hotspots.map((h, i) => ({
         id: h.id,
@@ -639,13 +657,14 @@ export class ExperienceWorld implements SequenceFx {
       case 'track': {
         // A target appears on the floor between the drone and the visitor, then gets locked.
         // Towards the visitor but angled ~30° aside, so it isn't hidden behind the info card.
-        const cam = this.booth.worldToLocal(this.o.handles.camera.getWorldPosition(tmpV));
+        const cam = this.stage.worldToLocal(this.o.handles.camera.getWorldPosition(tmpV));
         const dir = tmpV2.set(cam.x - r.x, 0, cam.z - r.z).normalize();
         const a = 0.55;
         const dx = dir.x * Math.cos(a) + dir.z * Math.sin(a);
         const dz = -dir.x * Math.sin(a) + dir.z * Math.cos(a);
-        const x = clamp(r.x + dx * 1.0, -1.6, 1.6);
-        const z = clamp(r.z + dz * 1.0, 0.3, 2.4);
+        const a2 = this.playArea;
+        const x = clamp(r.x + dx * 1.0, a2.minX, a2.maxX);
+        const z = clamp(r.z + dz * 1.0, a2.minZ, a2.maxZ);
         this.exploreTarget?.place(0, x, z);
         this.exploreTarget?.show(true);
         this.cone.show(true);
@@ -783,7 +802,7 @@ export class ExperienceWorld implements SequenceFx {
   private resolveAnchor(anchor: CalloutAnchor): (out: Vector3) => void {
     if (anchor === 'drone') return (out) => this.rig.root.localToWorld(out.set(0, this.rig.height + 0.08, 0));
     if (anchor === 'gimbal') return (out) => this.rig.gimbal.getWorldPosition(out);
-    if (Array.isArray(anchor)) return (out) => this.booth.localToWorld(out.set(anchor[0], anchor[1], anchor[2]));
+    if (Array.isArray(anchor)) return (out) => this.stage.localToWorld(out.set(anchor[0], anchor[1], anchor[2]));
     const item =
       'missionTarget' in anchor ? this.missionTargets?.items[anchor.missionTarget] : this.demoTargetsFx?.items[anchor.target];
     return (out) => {
@@ -984,7 +1003,7 @@ export class ExperienceWorld implements SequenceFx {
   private updateExplore(dt: number) {
     this.exploreT = Math.min(1, this.exploreT + dt / 1.6);
     const e = ease(this.exploreT);
-    const target = tmpV.copy(EXPLORE_POS).add(this.demoOffset);
+    const target = tmpV.copy(this.explorePos).add(this.demoOffset);
     const goal = this.exploreT < 1 ? tmpV2.copy(this.exploreFrom).lerp(target, e) : target;
     const r = this.rig.root;
     r.position.lerp(goal, 1 - Math.exp(-dt * 6));
@@ -1112,7 +1131,7 @@ export class ExperienceWorld implements SequenceFx {
       valid = fp.valid || this.phase === 'sequence' || this.phase === 'explore';
       this.lookPos.set(fx, 0, fz);
     }
-    const apex = this.booth.worldToLocal(this.rig.gimbal.getWorldPosition(tmpV2));
+    const apex = this.stage.worldToLocal(this.rig.gimbal.getWorldPosition(tmpV2));
     this.cone.update(dt, apex, fx, fz, fr, valid);
 
     // Ghost wingmen trail the drone in a loose V.
@@ -1121,7 +1140,11 @@ export class ExperienceWorld implements SequenceFx {
     const h = headingVectors(this.rig.root.rotation.y);
     for (const g of this.ghostRigs) {
       const side = g.userData.side as number;
-      const goal = tmpV.set(r.x + h.rx * side * 0.95 - h.fx * 0.45, r.y + 0.1, r.z + h.rz * side * 0.95 - h.fz * 0.45);
+      const goal = tmpV.set(
+        r.x + h.rx * side * GHOST_OFFSET.side - h.fx * GHOST_OFFSET.back,
+        r.y + GHOST_OFFSET.up,
+        r.z + h.rz * side * GHOST_OFFSET.side - h.fz * GHOST_OFFSET.back,
+      );
       g.position.lerp(goal, 1 - Math.exp(-dt * 2.5));
       g.rotation.y = this.rig.root.rotation.y;
       (g.userData.material as MeshBasicMaterial).opacity = 0.2 * this.ghostFade;
