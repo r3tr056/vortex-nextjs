@@ -8,7 +8,7 @@
     "prebuild": "node scripts/copy-xr8.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src eslint.config.mjs",
+    "lint": "eslint src scripts eslint.config.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-transform-types --no-warnings src/ar/core/*.test.ts",
     "ar:model": "node scripts/process-drone-model.mjs"
