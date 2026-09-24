@@ -1,35 +1,19 @@
-import { clean, forwardToSheet } from '@/lib/sheets';
+import { clean, createRateLimiter, forwardToSheet, readJsonObject } from '@/lib/sheets';
 
 // Anonymous booth-AR funnel events (sendBeacon batches) → Google Sheet ("Events" tab).
+// Analytics must never break the experience, so every path ends in 204.
 
 const MAX_EVENTS = 40;
-
-// Best-effort per-instance rate limit so one client can't flood the sheet (analytics only;
-// dropped batches are acceptable).
-const WINDOW_MS = 60_000;
-const MAX_BATCHES = 12;
-const hits = new Map<string, number[]>();
-function rateLimited(req: Request) {
-  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 5000) hits.clear();
-  return recent.length > MAX_BATCHES;
-}
+const MAX_BYTES = 20_000;
+const limited = createRateLimiter(60_000, 12);
 
 export async function POST(req: Request) {
-  if (rateLimited(req)) return new Response(null, { status: 204 });
+  if (limited(req)) return new Response(null, { status: 204 });
   let body: Record<string, unknown>;
   try {
-    const text = await req.text();
-    if (text.length > 20_000) return new Response(null, { status: 413 });
-    const parsed: unknown = JSON.parse(text);
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return new Response(null, { status: 400 });
-    body = parsed as Record<string, unknown>;
+    body = await readJsonObject(req, MAX_BYTES);
   } catch {
-    return new Response(null, { status: 400 });
+    return new Response(null, { status: 204 });
   }
 
   const events = Array.isArray(body.events) ? body.events.slice(0, MAX_EVENTS) : [];
@@ -53,10 +37,13 @@ export async function POST(req: Request) {
     return [t, session, drone, clean(ev.event, 40), detail, anchorMode, platform, src];
   });
 
-  const result = await forwardToSheet({ type: 'events', rows }, 6000);
-  if (!result.ok && result.reason === 'not_configured' && process.env.NODE_ENV !== 'production') {
-    console.info(`[ar-track] ${rows.map((r) => r[3]).join(', ')}`);
+  try {
+    const result = await forwardToSheet({ type: 'events', rows }, 6000);
+    if (!result.ok && result.reason === 'not_configured' && process.env.NODE_ENV !== 'production') {
+      console.info(`[ar-track] ${rows.map((r) => r[3]).join(', ')}`);
+    }
+  } catch {
+    // Best effort only.
   }
-  // Analytics must never break the experience: always 204.
   return new Response(null, { status: 204 });
 }

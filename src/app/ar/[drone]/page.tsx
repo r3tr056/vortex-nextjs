@@ -41,7 +41,7 @@ export default async function DroneArPage({ params }: { params: Promise<Params> 
   if (!drone) notFound();
   return (
     <main id="main">
-      <ARExperienceLoader slug={drone.slug} />
+      <ARExperienceLoader key={drone.slug} slug={drone.slug} />
     </main>
   );
 }

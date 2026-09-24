@@ -383,6 +383,13 @@ export class ExperienceWorld implements SequenceFx {
     this.filter.unlock();
   }
 
+  /** Leaves manual placement without placing (back to scanning). */
+  cancelPlacing() {
+    if (this.phase === 'placing') this.phase = 'idle';
+    this.reticle.group.visible = false;
+    this.placeValid = false;
+  }
+
   beginPlacing(kind: PlaceKind) {
     this.phase = 'placing';
     this.placeKind = kind;
@@ -690,7 +697,7 @@ export class ExperienceWorld implements SequenceFx {
     this.points.show(false);
     this.streaks.show(false);
     this.ghostsOn = false;
-    this.tether.show(false);
+    this.tether.hide();
     this.xrayGhost.visible = false;
     this.matRing.mesh.visible = false;
     this.o.store.setState({ gpsDenied: false });

@@ -4,8 +4,10 @@ import sharp from './sharp.mjs';
 /** Returns { positions (world space), normals (world space, may be null), indices, prim, node }. */
 export function readSingleMesh(doc) {
   const root = doc.getRoot();
-  const node = root.listNodes().find((n) => n.getMesh());
-  if (!node) throw new Error('No mesh node found');
+  // The pipeline edits one mesh in place; any other mesh would be left unscaled and misplaced.
+  const meshNodes = root.listNodes().filter((n) => n.getMesh());
+  if (meshNodes.length !== 1) throw new Error(`Expected exactly 1 mesh node, found ${meshNodes.length}`);
+  const node = meshNodes[0];
   const prims = node.getMesh().listPrimitives();
   if (prims.length !== 1) throw new Error(`Expected 1 primitive, found ${prims.length}`);
   const prim = prims[0];

@@ -90,6 +90,8 @@ export class LockOnMission {
   update(dt: number, fp: Footprint): MissionEvent[] {
     if (this.done) return [];
     const events: MissionEvent[] = [];
+    // A long frame (tab switch, GC) must not earn hold time past the deadline.
+    dt = Math.min(dt, this.timeLeft);
     this.elapsed += dt;
 
     for (const t of this.targets) {
@@ -200,7 +202,7 @@ export class SurveyMission {
 
   update(dt: number, fp: Footprint): { fresh: number[]; events: MissionEvent[] } {
     if (this.done) return { fresh: [], events: [] };
-    this.elapsed += dt;
+    this.elapsed += Math.min(dt, this.timeLeft);
     const fresh = this.grid.paint(fp);
     const events: MissionEvent[] = [];
     if (this.grid.coverage >= this.goal) {

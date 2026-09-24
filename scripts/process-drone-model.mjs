@@ -34,8 +34,15 @@ const diagonalM = Number(flag('diagonal'));
 const nose = flag('nose', '-x');
 const ratio = Number(flag('ratio', '0.12'));
 const maxError = Number(flag('error', '0.0015'));
-if (!input || !output || !diagonalM) {
-  console.error('Usage: process-drone-model.mjs <in.glb> <out.glb> --diagonal <metres> [--nose=-x|+x|-z|+z] [--ratio 0.12] [--error 0.0015]');
+const usage = 'Usage: process-drone-model.mjs <in.glb> <out.glb> --diagonal <metres> [--nose=-x|+x|-z|+z] [--ratio 0.12] [--error 0.0015]';
+const invalid = [
+  !input || !output ? 'input and output paths are required' : null,
+  !(diagonalM > 0 && diagonalM < 5) ? '--diagonal must be a motor-to-motor distance in metres (0-5)' : null,
+  !(ratio > 0 && ratio <= 1) ? '--ratio must be in (0, 1]' : null,
+  !(maxError > 0 && maxError < 1) ? '--error must be in (0, 1)' : null,
+].filter(Boolean);
+if (invalid.length) {
+  console.error(invalid.join('\n') + '\n' + usage);
   process.exit(1);
 }
 
@@ -168,11 +175,14 @@ for (let i = 0; i < vcount; i++) {
   const d = Math.hypot(positions[i * 3] - h.x, positions[i * 3 + 2] - h.z);
   if (d >= h.r * 0.16 && d <= h.r * 1.08) bladeVertex[i] = 1;
 }
+// A triangle touching any blade vertex is blade (root slivers would otherwise float in the air
+// under the spinning props). Hub and body vertices never qualify: blade vertices sit outside
+// 16% of the blade radius and inside the propeller's own cluster.
 const kept = [];
 let removed = 0;
 for (let t = 0; t < indices.length; t += 3) {
   const a = indices[t], b = indices[t + 1], c = indices[t + 2];
-  if (bladeVertex[a] && bladeVertex[b] && bladeVertex[c]) removed++;
+  if (bladeVertex[a] || bladeVertex[b] || bladeVertex[c]) removed++;
   else kept.push(a, b, c);
 }
 log(`removed ${removed} blade triangles, kept ${kept.length / 3}`);
@@ -206,11 +216,18 @@ if (normals) {
   const nAcc = prim.getAttribute('NORMAL');
   nAcc.setArray(normals);
 }
-prim.getIndices().setArray(Uint32Array.from(kept));
+// Meshy exports are indexed, but a non-indexed input gets an index accessor here.
+const keptIdx = Uint32Array.from(kept);
+if (prim.getIndices()) prim.getIndices().setArray(keptIdx);
+else prim.setIndices(doc.createAccessor('indices').setType('SCALAR').setArray(keptIdx).setBuffer(posAcc.getBuffer()));
 node.setMatrix([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 node.setName('body');
 
-const scene = doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0];
+let scene = doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0];
+if (!scene) {
+  scene = doc.createScene('Scene');
+  doc.getRoot().setDefaultScene(scene);
+}
 // Re-parent the body directly under the scene so prop anchors and body share a frame.
 for (const parent of doc.getRoot().listNodes()) if (parent.listChildren().includes(node)) parent.removeChild(node);
 if (!scene.listChildren().includes(node)) scene.addChild(node);

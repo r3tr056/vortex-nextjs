@@ -26,7 +26,7 @@ function Stick({ label, arrows, onChange }: StickProps) {
     const el = base.current;
     if (!el || !knob.current) return;
     const r = el.getBoundingClientRect();
-    const radius = r.width / 2 - 14;
+    const radius = Math.max(8, r.width / 2 - 14);
     let dx = clientX - (r.left + r.width / 2);
     let dy = clientY - (r.top + r.height / 2);
     const d = Math.hypot(dx, dy);

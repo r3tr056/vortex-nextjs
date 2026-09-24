@@ -709,6 +709,13 @@ export class Tether {
     if (on) this.group.visible = true;
   }
 
+  /** Immediate hide (update() stops being called when its demo ends, so no fade-out). */
+  hide() {
+    this.target = 0;
+    this.opacity = 0;
+    this.group.visible = false;
+  }
+
   /** from: drone underside; groundX/Z: ground station position (booth space). */
   update(dt: number, from: Vector3, groundX: number, groundZ: number) {
     this.opacity += (this.target - this.opacity) * Math.min(1, dt * 4);
@@ -720,19 +727,15 @@ export class Tether {
     const attr = this.line.geometry.attributes.position as BufferAttribute;
     const arr = attr.array as Float32Array;
     const n = arr.length / 6;
-    const p = (t: number, out: number[]) => {
-      // Slight catenary sag between the drone and the ground station.
-      const sag = Math.sin(Math.PI * t) * 0.12;
-      out[0] = from.x + (groundX - from.x) * t;
-      out[1] = from.y + (0.16 - from.y) * t - sag;
-      out[2] = from.z + (groundZ - from.z) * t;
+    // Point on the cable at t, with a slight catenary sag toward the ground station.
+    const put = (t: number, o: number) => {
+      arr[o] = from.x + (groundX - from.x) * t;
+      arr[o + 1] = from.y + (0.16 - from.y) * t - Math.sin(Math.PI * t) * 0.12;
+      arr[o + 2] = from.z + (groundZ - from.z) * t;
     };
-    const a = [0, 0, 0];
-    const b = [0, 0, 0];
     for (let i = 0; i < n; i++) {
-      p(i / n, a);
-      p((i + 1) / n, b);
-      arr.set([...a, ...b], i * 6);
+      put(i / n, i * 6);
+      put((i + 1) / n, i * 6 + 3);
     }
     attr.needsUpdate = true;
     (this.line.material as LineBasicMaterial).opacity = 0.9 * this.opacity;

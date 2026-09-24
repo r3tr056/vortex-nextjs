@@ -187,6 +187,8 @@ export class DroneRig {
     }
     scene.scale.multiplyScalar(s);
     scene.updateMatrixWorld(true);
+    // Box3.setFromObject measures in world space, and `scene` has no parent yet, so world space
+    // is the scaled model's own space: the centring below is consistent with it.
     const scaled = new Box3().setFromObject(scene);
     const centre = scaled.getCenter(new Vector3());
     scene.position.x -= centre.x;
@@ -340,6 +342,19 @@ export class DroneRig {
       m.clippingPlanes = [plane];
       m.needsUpdate = true;
     }
+  }
+
+  /** Frees GPU resources (the off-screen rig used for the Quick Look export). */
+  dispose() {
+    this.root.traverse((o) => {
+      const m = o as Mesh;
+      if (!m.isMesh) return;
+      m.geometry.dispose();
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        for (const v of Object.values(mat)) if (v && typeof v === 'object' && (v as { isTexture?: boolean }).isTexture) (v as { dispose(): void }).dispose();
+        mat.dispose();
+      }
+    });
   }
 
   /** Translucent hologram copy used for the "fleet" beat. */

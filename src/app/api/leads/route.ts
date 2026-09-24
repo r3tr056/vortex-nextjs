@@ -1,24 +1,28 @@
 import { NextResponse } from 'next/server';
-import { clean, forwardToSheet } from '@/lib/sheets';
+import { BodyTooLarge, clean, createRateLimiter, forwardToSheet, readJsonObject } from '@/lib/sheets';
 
 // Demo requests from the booth AR and the site contact form → Google Sheet ("Leads" tab).
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAX_BYTES = 8_000;
+// A real visitor submits once or twice; this only bites on scripted floods.
+const limited = createRateLimiter(10 * 60_000, 8);
 
 export async function POST(req: Request) {
+  if (limited(req)) return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 });
+
   let body: Record<string, unknown>;
   try {
-    const parsed: unknown = await req.json();
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('not an object');
-    body = parsed as Record<string, unknown>;
-  } catch {
-    return NextResponse.json({ ok: false, error: 'invalid' }, { status: 400 });
+    body = await readJsonObject(req, MAX_BYTES);
+  } catch (err) {
+    const tooLarge = err instanceof BodyTooLarge;
+    return NextResponse.json({ ok: false, error: tooLarge ? 'too_large' : 'invalid' }, { status: tooLarge ? 413 : 400 });
   }
 
-  // Honeypot (an obscure name so browser AutoFill leaves it alone). Bots fill every field; pretend
-  // success so they don't retry, but log it in case a real lead was caught.
+  // Honeypot (an obscure name so browser AutoFill leaves it alone). Bots fill every field;
+  // pretend success so they don't retry.
   if (clean(body.fax_extension, 200)) {
-    console.warn('[leads] honeypot hit', clean(body.email, 160));
+    console.warn('[leads] honeypot hit');
     return NextResponse.json({ ok: true });
   }
 
@@ -44,10 +48,10 @@ export async function POST(req: Request) {
   if (result.ok) return NextResponse.json({ ok: true });
 
   if (result.reason === 'not_configured' && process.env.NODE_ENV !== 'production') {
-    console.info('[leads] LEADS_WEBHOOK_URL not set; lead not stored (dev only):', lead);
+    console.info('[leads] LEADS_WEBHOOK_URL not set; lead not stored (dev only)');
     return NextResponse.json({ ok: true, dev: true });
   }
-  // Keep the lead recoverable from the Vercel logs if the sheet is unavailable.
-  console.error('[leads] forwarding failed:', result.reason, JSON.stringify(lead));
+  // No personal data in logs: the visitor is told to use WhatsApp/email instead.
+  console.error('[leads] forwarding failed', { reason: result.reason, source: lead.source, org: lead.organisation.slice(0, 40) });
   return NextResponse.json({ ok: false, error: result.reason }, { status: 502 });
 }

@@ -63,10 +63,11 @@ export function samplePath(keys: PathKey[], t: number, out?: PathSample): PathSa
   const du = 0.01;
   const [ax, ay, az] = pos(Math.max(0, u - du));
   const [bx, by, bz] = pos(Math.min(1, u + du));
-  const dt = span * (Math.min(1, u + du) - Math.max(0, u - du)) || 1;
-  s.vx = (bx - ax) / dt;
-  s.vy = (by - ay) / dt;
-  s.vz = (bz - az) / dt;
+  // Zero-length span (duplicate key times): hold still rather than report a made-up velocity.
+  const dt = span * (Math.min(1, u + du) - Math.max(0, u - du));
+  s.vx = dt > 0 ? (bx - ax) / dt : 0;
+  s.vy = dt > 0 ? (by - ay) / dt : 0;
+  s.vz = dt > 0 ? (bz - az) / dt : 0;
   s.yaw = k1.yaw + wrapAngle(k2.yaw - k1.yaw) * smooth(u);
   return s;
 }

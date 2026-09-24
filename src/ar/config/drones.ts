@@ -28,8 +28,8 @@ export interface StandeeQr {
   sizeM: number;
   centerM: [number, number];
   /**
-   * Optional substring of the QR's encoded URL. If set, other QR codes in view (e.g. the other
-   * standee's) are ignored. Leave empty to accept any QR.
+   * Substring of the QR's encoded URL (the qrfy short-link ID printed on this standee), so the
+   * other standee's code is ignored. Empty accepts any QR.
    */
   match: string;
 }
@@ -141,7 +141,7 @@ export const AR_DRONES: ArDrone[] = [
         target('sentinel', 'lower', [0.75, 1.0], [0, 0.5]),
         target('sentinel', 'close', [0.378, 0.504], [0.186, 0.252]),
       ],
-      qr: { sizeM: 0.1166, centerM: [0.2356, 0.1426], match: '' },
+      qr: { sizeM: 0.1166, centerM: [0.2356, 0.1426], match: 'h87RfO1BPO' },
     },
     hotspots: [
       {
@@ -218,7 +218,7 @@ export const AR_DRONES: ArDrone[] = [
         target('ranger', 'lower', [0.75, 1.0], [0, 0.5]),
         target('ranger', 'close', [0.379, 0.505], [0.186, 0.252]),
       ],
-      qr: { sizeM: 0.1166, centerM: [0.2441, 0.1427], match: '' },
+      qr: { sizeM: 0.1166, centerM: [0.2441, 0.1427], match: 'ZGRDovgJ92' },
     },
     hotspots: [
       {

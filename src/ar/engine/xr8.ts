@@ -39,7 +39,12 @@ export function preloadEngine(): Promise<XR8Api> {
       'xrloaded',
       () => {
         window.clearTimeout(timeout);
-        resolve(window.XR8);
+        if (window.XR8) {
+          resolve(window.XR8);
+        } else {
+          enginePromise = null;
+          reject(new Error('AR engine loaded without XR8'));
+        }
       },
       { once: true },
     );

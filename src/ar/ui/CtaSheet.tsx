@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Camera, Check, MessageCircle, Phone, X } from 'lucide-react';
 import { CONTACT, type ArDrone } from '../config/drones';
 import type { ArController } from '../controller';
@@ -23,9 +23,12 @@ export function Attribution() {
 function LeadForm({ drone, ctrl }: { drone: ArDrone; ctrl: ArController }) {
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState<string | null>(null);
+  const inFlight = useRef(false);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
     setStatus('submitting');
@@ -43,8 +46,17 @@ function LeadForm({ drone, ctrl }: { drone: ArDrone; ctrl: ArController }) {
       form.reset();
     } catch (err) {
       setStatus('error');
-      setMessage((err as Error).message === 'invalid' ? 'Please check your name, organisation and email.' : null);
+      const code = err instanceof Error ? err.message : '';
+      setMessage(
+        code === 'invalid'
+          ? 'Please check your name, organisation and email.'
+          : code === 'rate_limited'
+            ? 'Too many requests from this network. Try again in a few minutes, or message us on WhatsApp.'
+            : null,
+      );
       ctrl.trackLead(false);
+    } finally {
+      inFlight.current = false;
     }
   };
 
@@ -100,6 +112,16 @@ export function CtaSheet({ drone, ctrl }: { drone: ArDrone; ctrl: ArController }
     `Hi Vortex team — I just flew the ${drone.name} (${drone.num}) in AR and would like to know more.`,
   )}`;
 
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') ctrl.setCtaOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [ctrl]);
+
   // Close the sheet so it isn't in the way, then shoot. Progress shows as a HUD toast.
   const takePhoto = () => {
     ctrl.setCtaOpen(false);
@@ -120,7 +142,7 @@ export function CtaSheet({ drone, ctrl }: { drone: ArDrone; ctrl: ArController }
               See it fly for real
             </h2>
           </div>
-          <button className={styles.iconBtn} onClick={() => ctrl.setCtaOpen(false)} aria-label="Close">
+          <button ref={closeRef} className={styles.iconBtn} onClick={() => ctrl.setCtaOpen(false)} aria-label="Close">
             <X size={18} />
           </button>
         </div>

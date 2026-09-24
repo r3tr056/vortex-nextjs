@@ -14,7 +14,7 @@
     "ar:model": "node scripts/process-drone-model.mjs"
   },
   "dependencies": {
-    "@8thwall/engine-binary": "^1.0.0",
+    "@8thwall/engine-binary": "1.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",

@@ -22,6 +22,9 @@ export async function buildUsdz(model: Object3D): Promise<string> {
   const { USDZExporter } = await import('three/examples/jsm/exporters/USDZExporter.js');
   const exportRoot = new Group();
   const clone = model.clone(true);
+  // The rig lifts the model so it pivots about its body; Quick Look puts the origin on the floor,
+  // where the model's feet already are.
+  clone.position.set(0, 0, 0);
   // Drop helper meshes (prop blur discs, effects) that only make sense when animated.
   const drop: Object3D[] = [];
   clone.traverse((o) => {
@@ -40,26 +43,35 @@ export async function buildUsdz(model: Object3D): Promise<string> {
  * Opens Quick Look. Must run synchronously inside a tap handler, so the USDZ must already be
  * built. `onBannerTap` fires when the visitor taps the "Book a demo" banner inside Quick Look.
  */
+// One persistent, hidden link: Quick Look posts the banner tap to the link that opened it, however
+// long the visitor stays in AR.
+let link: HTMLAnchorElement | null = null;
+let bannerTap: (() => void) | null = null;
+
 export function openQuickLook(usdzUrl: string, drone: ArDrone, onBannerTap: () => void) {
-  const params = new URLSearchParams({
+  // Apple documents %20-encoded fragment values (URLSearchParams would send "+").
+  const fragment = Object.entries({
     callToAction: 'Book a demo',
     checkoutTitle: `Vortex ${drone.name} · ${drone.num}`,
     checkoutSubtitle: drone.role,
     allowsContentScaling: '0',
-  });
-  const a = document.createElement('a');
-  a.rel = 'ar';
-  a.href = `${usdzUrl}#${params.toString()}`;
-  // Quick Look requires the anchor to wrap an image.
-  a.appendChild(document.createElement('img'));
-  a.addEventListener(
-    'message',
-    (e) => {
-      if ((e as MessageEvent).data === QUICK_LOOK_BUTTON_EVENT) onBannerTap();
-    },
-    false,
-  );
-  document.body.appendChild(a);
-  a.click();
-  window.setTimeout(() => a.remove(), 60_000);
+  })
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+  bannerTap = onBannerTap;
+  if (!link) {
+    link = document.createElement('a');
+    link.rel = 'ar';
+    link.style.display = 'none';
+    // Blob URLs need a download name for Quick Look to accept them.
+    link.download = 'vortex-drone.usdz';
+    // Quick Look requires the link to wrap an image.
+    link.appendChild(document.createElement('img'));
+    link.addEventListener('message', (e) => {
+      if ((e as MessageEvent).data === QUICK_LOOK_BUTTON_EVENT) bannerTap?.();
+    });
+    document.body.appendChild(link);
+  }
+  link.href = `${usdzUrl}#${fragment}`;
+  link.click();
 }

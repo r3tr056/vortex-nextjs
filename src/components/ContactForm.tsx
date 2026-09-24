@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>('idle');
+  const inFlight = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     // Capture the form now: React clears currentTarget once the handler yields.
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -25,6 +28,7 @@ export default function ContactForm() {
           interest: data.get('platform') || 'All platforms',
           message: data.get('message'),
           nda: data.get('nda') === 'on',
+          fax_extension: data.get('fax_extension') ?? '',
           source: 'site-contact',
         }),
       });
@@ -34,6 +38,8 @@ export default function ContactForm() {
       form.reset();
     } catch {
       setStatus('error');
+    } finally {
+      inFlight.current = false;
     }
   };
 
@@ -159,6 +165,15 @@ export default function ContactForm() {
           (VAS-05 Sentinel-M, VAS-06 Hornet).
         </label>
       </div>
+
+      {/* Honeypot for bots (people never see or tab into it). */}
+      <input
+        name="fax_extension"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }}
+      />
 
       <button type="submit" className="btn-primary" disabled={disabled}>
         {status === 'submitting' && 'Submitting…'}

@@ -43,7 +43,7 @@ function solve8(A: number[][], b: number[]): number[] | null {
  * @returns marker pose in camera space, or null if the solution is degenerate.
  */
 export function solveMarkerPose(corners: NdcPoint[], projection: Matrix4, size: number): MarkerPose | null {
-  if (corners.length !== 4) return null;
+  if (corners.length !== 4 || !Number.isFinite(size) || size <= 0) return null;
   const e = projection.elements;
   const half = size / 2;
   const plane = [

@@ -164,7 +164,8 @@ export class AnchorFilter {
 
   push(pose: BoothPose, now: number): FilterResult {
     const o = this.o;
-    const sample = { pose, t: now };
+    // Own copy: callers may reuse their pose object, and a locked pose is blended in place.
+    const sample = { pose: { position: pose.position.clone(), yaw: pose.yaw, scale: pose.scale }, t: now };
     if (!this.locked) {
       this.pending = this.pending.filter((s) => now - s.t <= o.windowMs);
       this.pending.push(sample);
@@ -176,8 +177,8 @@ export class AnchorFilter {
       }
       return 'pending';
     }
-    if (agrees(this.locked, pose, o)) {
-      blendPose(this.locked, pose, o.follow);
+    if (agrees(this.locked, sample.pose, o)) {
+      blendPose(this.locked, sample.pose, o.follow);
       this.outliers = [];
       return 'updated';
     }

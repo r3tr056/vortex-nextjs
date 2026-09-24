@@ -58,6 +58,7 @@ export class PreviewSession implements ArSession {
   private raf = 0;
   private controls: OrbitControls | null = null;
   private onResize: (() => void) | null = null;
+  private scene: Scene | null = null;
 
   constructor(private readonly standee: PreviewStandee) {}
 
@@ -67,6 +68,7 @@ export class PreviewSession implements ArSession {
     this.renderer = renderer;
 
     const scene = new Scene();
+    this.scene = scene;
     scene.background = new Color('#06080d');
     scene.fog = new Fog('#06080d', 7, 16);
 
@@ -92,6 +94,7 @@ export class PreviewSession implements ArSession {
     standee.add(back, face, base);
     scene.add(standee);
     new TextureLoader().load(this.standee.image, (tex) => {
+      if (!this.renderer) return tex.dispose();
       tex.colorSpace = SRGBColorSpace;
       const art = new Mesh(new PlaneGeometry(w, h), new MeshBasicMaterial({ map: tex }));
       art.position.set(0, h / 2, 0.014);
@@ -147,6 +150,16 @@ export class PreviewSession implements ArSession {
     cancelAnimationFrame(this.raf);
     if (this.onResize) window.removeEventListener('resize', this.onResize);
     this.controls?.dispose();
+    this.scene?.traverse((o) => {
+      const m = o as Mesh;
+      if (!m.isMesh) return;
+      m.geometry.dispose();
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        (mat as MeshBasicMaterial).map?.dispose();
+        mat.dispose();
+      }
+    });
+    this.scene = null;
     this.renderer?.dispose();
     this.renderer = null;
   }

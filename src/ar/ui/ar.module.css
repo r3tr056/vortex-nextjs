@@ -9,6 +9,7 @@
 }
 
 .root {
+  --stick: clamp(108px, 30vw, 150px);
   position: fixed;
   inset: 0;
   background: #000;
@@ -643,7 +644,6 @@
 /* ── Sticks ───────────────────────────────────────────────────────────── */
 
 .sticks {
-  --stick: clamp(108px, 30vw, 150px);
   position: absolute;
   left: max(18px, env(safe-area-inset-left));
   right: max(18px, env(safe-area-inset-right));
@@ -1315,7 +1315,7 @@
 
 /* Landscape phones: HUD hugs the edges so the drone keeps the middle of the screen. */
 @media (orientation: landscape) and (max-height: 540px) {
-  .sticks {
+  .root {
     --stick: min(36vh, 132px);
   }
   .caption {

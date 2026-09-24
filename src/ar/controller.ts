@@ -1,7 +1,7 @@
 // Glue between the AR session, the 3D world, audio, analytics and the React HUD.
 //
 // Engine choice (best native AR first):
-//   Android Chrome with ARCore → WebXR (ARCore tracking, QR anchoring, occlusion, light estimation)
+//   Android Chrome with ARCore → WebXR (ARCore tracking, QR anchoring, anchors, light estimation)
 //   iPhone / other phones      → 8th Wall (in-browser SLAM + standee image targets); on iOS, AR
 //                                Quick Look (native ARKit) is offered alongside
 //   Desktop / no camera        → 3D preview
@@ -80,6 +80,7 @@ export class ArController {
   private hotspots: HotspotLayer | null = null;
   private engine: EngineKind = 'preview';
   private webxrSupported = false;
+  private capsKnown = false;
   private targetsAvailable = false;
   private scanStart = 0;
   private disposed = false;
@@ -89,6 +90,7 @@ export class ArController {
   private usdzUrl: string | null = null;
   private noticeTimer = 0;
   private photoTimer = 0;
+  private rescanTimer = 0;
   private readonly follow = new Vector3();
   /** Debug/demo: `?mode=3d` forces the 3D preview on phones. */
   forcePreview = false;
@@ -126,6 +128,7 @@ export class ArController {
     for (const t of this.drone.standee.targets) void fetch(t.dataUrl).catch(() => {});
     const { isWebXrArSupported } = await import('./engine/webxr');
     this.webxrSupported = this.platform !== 'ios' && (await isWebXrArSupported());
+    this.capsKnown = true;
     this.track('capabilities', { webxr: this.webxrSupported });
     // Warm the engine this device will use.
     if (!this.webxrSupported) void import('./engine/xr8').then((m) => m.preloadEngine()).catch(() => {});
@@ -139,8 +142,11 @@ export class ArController {
       if (!isQuickLookSupported()) return;
       const { DroneRig } = await import('./scene/drone');
       const rig = await DroneRig.create({ slug: this.drone.slug, model: this.drone.model });
-      if (this.disposed) return;
-      this.usdzUrl = await buildUsdz(rig.model);
+      if (this.disposed) return rig.dispose();
+      const url = await buildUsdz(rig.model);
+      rig.dispose();
+      if (this.disposed) return URL.revokeObjectURL(url);
+      this.usdzUrl = url;
       this.store.setState({ quickLookReady: true });
     } catch (err) {
       console.warn('[ar] Quick Look model unavailable', err);
@@ -170,16 +176,20 @@ export class ArController {
 
   /** Must be called synchronously from the Start tap (WebXR session, iOS motion, audio). */
   start(mode: StartMode, surfaces: Surfaces) {
-    if (this.session) return;
+    // A double tap must not open a second camera / XR session.
+    if (this.session || this.state.phase === 'starting') return;
     const run = ++this.run;
     this.audio.unlock();
     const preview = mode === 'preview' || this.forcePreview;
+    // A tap that beats the capability check on Android still tries ARCore first; if the request
+    // is refused, boot() falls back to 8th Wall.
+    const tryWebXr = this.webxrSupported || (!this.capsKnown && this.platform === 'android' && !!navigator.xr);
 
     let xrSession: Promise<XRSession> | null = null;
     let motion: Promise<unknown> | null = null;
     if (preview) {
       this.engine = 'preview';
-    } else if (this.webxrSupported) {
+    } else if (tryWebXr) {
       this.engine = 'webxr';
       xrSession = this.requestXrSession(surfaces.overlay);
     } else {
@@ -194,11 +204,11 @@ export class ArController {
   /** Inlined (not behind a dynamic import) so the request happens inside the tap. */
   private requestXrSession(overlay: HTMLElement): Promise<XRSession> | null {
     if (!navigator.xr) return null;
+    // No depth-sensing: see engine/webxr.ts (three's occlusion can't use ARCore depth).
     return navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['hit-test'],
-      optionalFeatures: ['dom-overlay', 'anchors', 'light-estimation', 'depth-sensing', 'camera-access', 'local-floor'],
+      optionalFeatures: ['dom-overlay', 'anchors', 'light-estimation', 'camera-access'],
       domOverlay: { root: overlay },
-      depthSensing: { usagePreference: ['gpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32', 'unsigned-short'] },
     } as XRSessionInit);
   }
 
@@ -228,22 +238,46 @@ export class ArController {
       this.callouts = new CalloutLayer(s.callouts);
       this.hotspots = new HotspotLayer(s.hotspots, (id) => this.selectHotspot(id));
       const session = await this.createSession(run, xrSession);
-      if (!session || this.stale(run)) return;
+      if (!session) return;
+      if (this.stale(run)) return session.stop();
       this.session = session;
+      // Every callback is bound to this run and this session: late events from a stopped or
+      // replaced session (a slow model load, an engine exception) never touch the current one.
+      const live = () => !this.stale(run) && this.session === session;
       await session.start(s.canvas, {
         onReady: (h) => {
-          this.onReady(run, h).catch((err) => this.fail('engine', err instanceof Error ? err.message : String(err)));
+          if (!live()) return;
+          this.onReady(run, h).catch((err) => {
+            if (live()) this.fail('engine', err instanceof Error ? err.message : String(err));
+          });
         },
-        onFrame: (dt) => this.onFrame(dt),
-        onImageFound: (e) => this.onImage(e),
-        onImageUpdated: (e) => this.onImage(e),
-        onMarker: (e) => this.onMarker(e),
-        onAnchor: (p, yaw) => this.world?.onNativeAnchor(p, yaw),
-        onLighting: (e) => this.world?.setLighting(e),
-        onTracking: (status, reason) =>
-          this.store.setState({ trackingWarning: status === 'LIMITED' ? TRACKING_HINTS[reason] ?? null : null }),
-        onEnded: () => this.onSessionEnded(),
-        onError: (kind, message) => this.fail(kind, message),
+        onFrame: (dt) => {
+          if (live()) this.onFrame(dt);
+        },
+        onImageFound: (e) => {
+          if (live()) this.onImage(e);
+        },
+        onImageUpdated: (e) => {
+          if (live()) this.onImage(e);
+        },
+        onMarker: (e) => {
+          if (live()) this.onMarker(e);
+        },
+        onAnchor: (p, yaw) => {
+          if (live()) this.world?.onNativeAnchor(p, yaw);
+        },
+        onLighting: (e) => {
+          if (live()) this.world?.setLighting(e);
+        },
+        onTracking: (status, reason) => {
+          if (live()) this.store.setState({ trackingWarning: status === 'LIMITED' ? TRACKING_HINTS[reason] ?? null : null });
+        },
+        onEnded: () => {
+          if (live()) this.onSessionEnded();
+        },
+        onError: (kind, message) => {
+          if (live()) this.fail(kind, message);
+        },
       });
     } catch (err) {
       if (this.stale(run)) return;
@@ -251,7 +285,8 @@ export class ArController {
       if (this.engine === 'webxr') {
         // ARCore declined (not installed, permission, device quirk): fall back to 8th Wall.
         this.track('webxr_failed', { message: message.slice(0, 80) });
-        this.session?.stop();
+        if (this.session) this.session.stop();
+        else xrSession?.then((x) => x.end()).catch(() => {});
         this.session = null;
         this.engine = 'xr8';
         this.store.setState({ engine: 'xr8' });
@@ -275,15 +310,27 @@ export class ArController {
         this.fail('unsupported', compat.reasons.join(', '));
         return null;
       }
-      const targets = await Promise.all(
-        this.drone.standee.targets.map((t) => fetch(t.dataUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null)),
-      );
-      const data = targets.filter(Boolean);
+      const data = await this.loadTargets();
+      if (this.stale(run)) return null;
       this.targetsAvailable = data.length > 0;
+      if (data.length < this.drone.standee.targets.length) {
+        this.track('targets_partial', { loaded: data.length, of: this.drone.standee.targets.length });
+        if (!data.length) this.notify('Standee recognition didn’t load — place the drone by hand');
+      }
       return new xr8.Xr8Session(data);
     }
     const { PreviewSession } = await import('./engine/preview');
     return new PreviewSession({ image: this.drone.standee.previewImage, sizeM: this.drone.standee.printSizeM });
+  }
+
+  /** Standee image-target definitions, each retried once (busy hall networks drop requests). */
+  private async loadTargets(): Promise<unknown[]> {
+    const get = (url: string) =>
+      fetch(url).then((r) => (r.ok ? (r.json() as Promise<unknown>) : Promise.reject(new Error(`HTTP ${r.status}`))));
+    const retry = (url: string) =>
+      get(url).catch(() => new Promise((r) => window.setTimeout(r, 700)).then(() => get(url)).catch(() => null));
+    const results = await Promise.all(this.drone.standee.targets.map((t) => retry(t.dataUrl)));
+    return results.filter((d): d is NonNullable<typeof d> => d !== null);
   }
 
   private async onReady(run: number, handles: SessionHandles) {
@@ -335,6 +382,7 @@ export class ArController {
   private handleFilterResult(r: FilterResult | null, detail: Detail) {
     const world = this.world;
     if (!world || !r) return;
+    window.clearTimeout(this.rescanTimer);
     if (r === 'locked' && this.state.phase === 'scanning') {
       world.setAnchorMode('standee');
       this.session?.setBoothAnchor?.(world.boothPose);
@@ -420,6 +468,7 @@ export class ArController {
   /** Back to scanning from manual placement (e.g. the visitor found the standee after all). */
   backToScanning() {
     if (!this.world || !this.canScan()) return;
+    this.world.cancelPlacing();
     this.world.requestReanchor();
     this.session?.setMarkerScanning?.(true);
     this.scanStart = performance.now();
@@ -434,6 +483,11 @@ export class ArController {
       world.requestReanchor();
       this.session?.setMarkerScanning?.(true);
       this.notify(this.engine === 'webxr' ? 'Point at the QR code on the standee' : 'Point at the standee to re-align');
+      // Scanning costs a camera readback every 300 ms: stop if no sighting comes in.
+      window.clearTimeout(this.rescanTimer);
+      this.rescanTimer = window.setTimeout(() => {
+        if (this.state.phase !== 'scanning') this.session?.setMarkerScanning?.(false);
+      }, 15_000);
     } else {
       this.placeManually(this.state.anchorMode === 'floor' ? 'floor' : 'standee');
     }
@@ -508,14 +562,12 @@ export class ArController {
   async capturePhoto() {
     window.clearTimeout(this.photoTimer);
     this.store.setState({ photo: 'working' });
-    const shot = await this.session?.screenshot();
     let result: 'shared' | 'downloaded' | 'cancelled' | 'failed' = 'failed';
-    if (shot) {
-      try {
-        result = await shareOrDownload(await composeSharePhoto(shot, this.drone), this.drone);
-      } catch {
-        result = 'failed';
-      }
+    try {
+      const shot = await this.session?.screenshot();
+      if (shot) result = await shareOrDownload(await composeSharePhoto(shot, this.drone), this.drone);
+    } catch {
+      result = 'failed';
     }
     this.track('photo', { result, engine: this.engine });
     this.store.setState({ photo: result === 'failed' ? 'failed' : 'done' });
@@ -540,6 +592,7 @@ export class ArController {
       },
     };
     this.run++;
+    window.clearTimeout(this.rescanTimer);
     this.store.setState({ phase: 'error', error: copy[kind] });
     this.track('error', { kind, engine: this.engine, message: message.slice(0, 120) });
     this.world?.dispose();
@@ -551,6 +604,7 @@ export class ArController {
   /** Tear down and return to the intro (after an error or when the AR session ends). */
   reset() {
     this.run++;
+    window.clearTimeout(this.rescanTimer);
     this.world?.dispose();
     this.world = null;
     this.session?.stop();
@@ -565,6 +619,7 @@ export class ArController {
     this.run++;
     window.clearTimeout(this.noticeTimer);
     window.clearTimeout(this.photoTimer);
+    window.clearTimeout(this.rescanTimer);
     this.tracker?.dispose();
     this.tracker = null;
     this.world?.dispose();

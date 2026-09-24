@@ -142,3 +142,23 @@ test('samplePath hits keyframes and clamps outside the range', () => {
   const end = samplePath(keys, 5);
   assert.deepEqual([end.x, end.y, end.z], [2, 0, 0]);
 });
+
+test('a long frame at the deadline cannot finish a lock-on', () => {
+  const mission = new LockOnMission([{ id: 'a', kind: 'vehicle', label: 'V', x: 0, z: 2 }], 2, 1.5);
+  mission.update(1.9, { x: 3, z: 3, r: 0.5, valid: true });
+  // 0.1 s left: a 2 s frame spent over the target only earns 0.1 s of hold time.
+  const events = mission.update(2, { x: 0, z: 2, r: 0.5, valid: true });
+  assert.equal(mission.targets[0].locked, false);
+  assert.deepEqual(events.at(-1), { type: 'complete', success: false });
+});
+
+test('samplePath reports zero velocity across a zero-length span', () => {
+  const keys = [
+    { t: 0, p: [0, 0, 0] as [number, number, number], yaw: 0 },
+    { t: 1, p: [1, 0, 0] as [number, number, number], yaw: 0 },
+    { t: 1, p: [2, 0, 0] as [number, number, number], yaw: 0 },
+    { t: 2, p: [3, 0, 0] as [number, number, number], yaw: 0 },
+  ];
+  const s = samplePath(keys, 1);
+  assert.ok(Number.isFinite(s.vx) && Number.isFinite(s.vy) && Number.isFinite(s.vz));
+});

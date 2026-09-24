@@ -10,6 +10,7 @@ interface QueuedEvent {
 }
 
 const ENDPOINT = '/api/ar/track';
+const MAX_REQUEUE = 30;
 
 function newSessionId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
@@ -38,16 +39,19 @@ export class Tracker {
 
   flush = () => {
     if (!this.queue.length) return;
-    const body = JSON.stringify({
-      sessionId: this.sessionId,
-      ...this.base,
-      anchorMode: this.anchorMode,
-      events: this.queue.splice(0),
-    });
-    const blob = new Blob([body], { type: 'application/json' });
-    if (!navigator.sendBeacon?.(ENDPOINT, blob)) {
-      void fetch(ENDPOINT, { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'application/json' } }).catch(() => {});
+    const events = this.queue.splice(0);
+    let body: string;
+    try {
+      body = JSON.stringify({ sessionId: this.sessionId, ...this.base, anchorMode: this.anchorMode, events });
+    } catch {
+      return; // an unserialisable detail: drop the batch rather than break the experience
     }
+    if (navigator.sendBeacon?.(ENDPOINT, new Blob([body], { type: 'application/json' }))) return;
+    void fetch(ENDPOINT, { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'application/json' } }).catch(() => {
+      // Offline for a moment (hall Wi-Fi): keep the most recent events for the next flush.
+      this.queue.unshift(...events.slice(-MAX_REQUEUE));
+      this.queue.splice(MAX_REQUEUE * 2);
+    });
   };
 
   dispose() {

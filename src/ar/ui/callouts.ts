@@ -69,11 +69,13 @@ export class CalloutLayer {
     for (const c of this.items.values()) {
       c.resolve(tmp);
       tmp.project(camera);
-      const behind = tmp.z > 1;
+      // Behind the camera, or well outside the view (a label pinned to the screen edge misleads).
+      const hidden = tmp.z > 1 || Math.abs(tmp.x) > 1.25 || Math.abs(tmp.y) > 1.25;
+      c.el.style.visibility = hidden ? 'hidden' : 'visible';
+      if (hidden) continue;
       const x = (tmp.x * 0.5 + 0.5) * width;
       const y = (-tmp.y * 0.5 + 0.5) * height;
       c.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-      c.el.style.visibility = behind ? 'hidden' : 'visible';
     }
   }
 
