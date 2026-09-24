@@ -1,0 +1,23 @@
+{
+  "imagePath": "/ar-assets/targets/sentinel-upper_luminance.png",
+  "metadata": null,
+  "name": "sentinel-upper",
+  "type": "PLANAR",
+  "properties": {
+    "top": 0,
+    "left": 0,
+    "width": 952,
+    "height": 1269,
+    "isRotated": false,
+    "originalWidth": 952,
+    "originalHeight": 2400
+  },
+  "resources": {
+    "originalImage": "sentinel-upper_original.png",
+    "croppedImage": "sentinel-upper_cropped.png",
+    "thumbnailImage": "sentinel-upper_thumbnail.png",
+    "luminanceImage": "sentinel-upper_luminance.png"
+  },
+  "created": 1790277823965,
+  "updated": 1790277823965
+}

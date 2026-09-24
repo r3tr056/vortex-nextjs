@@ -37,3 +37,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+# 8th Wall engine (copied from node_modules by scripts/copy-xr8.mjs)
+public/xr8/
+
+# Raw 3D exports (Meshy) + standee print files — processed copies live in public/ar-assets
+3d_models/

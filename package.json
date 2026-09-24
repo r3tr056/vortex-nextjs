@@ -3,24 +3,40 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/copy-xr8.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/copy-xr8.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src eslint.config.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-transform-types --no-warnings src/ar/core/*.test.ts",
+    "ar:model": "node scripts/process-drone-model.mjs"
   },
   "dependencies": {
+    "@8thwall/engine-binary": "^1.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "^16.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
+    "@8thwall/image-target-cli": "^1.0.0",
+    "@gltf-transform/cli": "^4.5.0",
+    "@gltf-transform/core": "^4.5.0",
+    "@gltf-transform/extensions": "^4.5.0",
+    "@gltf-transform/functions": "^4.5.0",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.1.7",
+    "meshoptimizer": "^1.2.0",
     "typescript": "^5"
   }
 }

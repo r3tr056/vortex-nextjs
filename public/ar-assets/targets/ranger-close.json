@@ -1,0 +1,23 @@
+{
+  "imagePath": "/ar-assets/targets/ranger-close_luminance.png",
+  "metadata": null,
+  "name": "ranger-close",
+  "type": "PLANAR",
+  "properties": {
+    "top": 1820,
+    "left": 471,
+    "width": 480,
+    "height": 640,
+    "isRotated": false,
+    "originalWidth": 951,
+    "originalHeight": 2460
+  },
+  "resources": {
+    "originalImage": "ranger-close_original.png",
+    "croppedImage": "ranger-close_cropped.png",
+    "thumbnailImage": "ranger-close_thumbnail.png",
+    "luminanceImage": "ranger-close_luminance.png"
+  },
+  "created": 1790277824321,
+  "updated": 1790277824321
+}

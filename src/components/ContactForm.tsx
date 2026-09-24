@@ -9,13 +9,29 @@ export default function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Capture the form now: React clears currentTarget once the handler yields.
+    const form = e.currentTarget;
+    const data = new FormData(form);
     setStatus('submitting');
     try {
-      // Hook this up to a real endpoint (API route / Resend / Formspree).
-      // For now, simulate success so the UI flow can be tested.
-      await new Promise((r) => setTimeout(r, 600));
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${data.get('firstName') ?? ''} ${data.get('lastName') ?? ''}`.trim(),
+          organisation: data.get('organisation'),
+          email: data.get('email'),
+          inquiryType: data.get('inquiryType'),
+          interest: data.get('platform') || 'All platforms',
+          message: data.get('message'),
+          nda: data.get('nda') === 'on',
+          source: 'site-contact',
+        }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean };
+      if (!res.ok || !json.ok) throw new Error('lead not stored');
       setStatus('success');
-      (e.currentTarget as HTMLFormElement).reset();
+      form.reset();
     } catch {
       setStatus('error');
     }

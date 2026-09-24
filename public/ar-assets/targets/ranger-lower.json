@@ -1,0 +1,23 @@
+{
+  "imagePath": "/ar-assets/targets/ranger-lower_luminance.png",
+  "metadata": null,
+  "name": "ranger-lower",
+  "type": "PLANAR",
+  "properties": {
+    "top": 1192,
+    "left": 0,
+    "width": 951,
+    "height": 1268,
+    "isRotated": false,
+    "originalWidth": 951,
+    "originalHeight": 2460
+  },
+  "resources": {
+    "originalImage": "ranger-lower_original.png",
+    "croppedImage": "ranger-lower_cropped.png",
+    "thumbnailImage": "ranger-lower_thumbnail.png",
+    "luminanceImage": "ranger-lower_luminance.png"
+  },
+  "created": 1790277824255,
+  "updated": 1790277824255
+}

@@ -1,0 +1,23 @@
+{
+  "imagePath": "/ar-assets/targets/sentinel-lower_luminance.png",
+  "metadata": null,
+  "name": "sentinel-lower",
+  "type": "PLANAR",
+  "properties": {
+    "top": 1131,
+    "left": 0,
+    "width": 952,
+    "height": 1269,
+    "isRotated": false,
+    "originalWidth": 952,
+    "originalHeight": 2400
+  },
+  "resources": {
+    "originalImage": "sentinel-lower_original.png",
+    "croppedImage": "sentinel-lower_cropped.png",
+    "thumbnailImage": "sentinel-lower_thumbnail.png",
+    "luminanceImage": "sentinel-lower_luminance.png"
+  },
+  "created": 1790277824016,
+  "updated": 1790277824016
+}
