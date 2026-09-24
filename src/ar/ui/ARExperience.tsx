@@ -389,13 +389,18 @@ function MissionBrief({ drone, ctrl, onDismiss }: { drone: ArDrone; ctrl: ArCont
   );
 }
 
+function formatClock(seconds: number) {
+  const s = Math.max(0, Math.ceil(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
 function MissionHudView({ state }: { state: ArState }) {
   const m = state.mission;
   if (!m) return null;
   return (
     <div className={styles.missionHud}>
       <div className={styles.timer}>
-        <span className={`${styles.timerValue} ${m.timeLeft <= 10 ? styles.timerLow : ''}`}>0:{String(m.timeLeft).padStart(2, '0')}</span>
+        <span className={`${styles.timerValue} ${m.timeLeft <= 10 ? styles.timerLow : ''}`}>{formatClock(m.timeLeft)}</span>
         {m.type === 'lockon' ? (
           <span className={styles.dots} aria-label={`${m.value} of ${m.goal} targets locked`}>
             {Array.from({ length: m.goal }, (_, i) => (

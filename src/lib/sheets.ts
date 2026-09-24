@@ -71,7 +71,8 @@ export class BodyTooLarge extends Error {}
  */
 export async function readJsonObject(req: Request, maxBytes: number): Promise<Record<string, unknown>> {
   const declared = Number(req.headers.get('content-length') ?? '0');
-  if (declared > maxBytes) throw new BodyTooLarge();
+  // A malformed length is ignored here; the streaming count below still caps the body.
+  if (Number.isFinite(declared) && declared > maxBytes) throw new BodyTooLarge();
   if (!req.body) throw new SyntaxError('empty body');
   const reader = req.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -109,12 +110,14 @@ export function createRateLimiter(windowMs: number, max: number) {
     const ip = req.headers.get('x-real-ip') ?? req.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ?? 'unknown';
     const now = Date.now();
     const recent = (hits.get(ip) ?? []).filter((t) => now - t < windowMs);
-    recent.push(now);
+    // Blocked requests are not recorded, so a flood can't grow the list past `max`.
+    const blocked = recent.length >= max;
+    if (!blocked) recent.push(now);
     hits.set(ip, recent);
     if (hits.size > 5000) {
       // Evict expired entries rather than resetting everyone's window.
       for (const [k, v] of hits) if (v.every((t) => now - t >= windowMs)) hits.delete(k);
     }
-    return recent.length > max;
+    return blocked;
   };
 }

@@ -49,6 +49,7 @@ function propDiscTexture() {
   g.fillRect(0, 0, s, s);
   discTexture = new CanvasTexture(c);
   discTexture.colorSpace = SRGBColorSpace;
+  discTexture.userData.shared = true;
   return discTexture;
 }
 
@@ -211,6 +212,8 @@ export class DroneRig {
       // The processing script stores the blade radius (metres) and spin direction per hub.
       const radius = typeof a.userData.radius === 'number' ? a.userData.radius : cfg.propDiameterM / 2;
       const spin: 1 | -1 = a.userData.spin === -1 ? -1 : a.userData.spin === 1 ? 1 : i % 2 === 0 ? 1 : -1;
+      // `radius` is in final metres. The anchor sits inside `scene` and inherits its scale `s`, so
+      // the local diameter is divided by `s` once; the world-space diameter comes out as radius·2.
       const prop = new PropRig((radius * 2) / s, spin, bladeMat);
       a.add(prop.group);
       this.props.push(prop);
@@ -351,7 +354,10 @@ export class DroneRig {
       if (!m.isMesh) return;
       m.geometry.dispose();
       for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
-        for (const v of Object.values(mat)) if (v && typeof v === 'object' && (v as { isTexture?: boolean }).isTexture) (v as { dispose(): void }).dispose();
+        for (const v of Object.values(mat)) {
+          const tex = v as { isTexture?: boolean; userData?: { shared?: boolean }; dispose?: () => void } | null;
+          if (tex && typeof tex === 'object' && tex.isTexture && !tex.userData?.shared) tex.dispose?.();
+        }
         mat.dispose();
       }
     });

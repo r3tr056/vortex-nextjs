@@ -109,11 +109,11 @@ export const systems = [
       { label: 'Ladakh-rated', type: 'tag' },
       { label: 'Tethered variant', type: 'tag' },
     ],
-    keySpec: '3,500m+ · Man-portable',
+    keySpec: '5,000m+ · Man-portable',
     featured: false,
-    desc: 'Lightweight intelligence, surveillance, and reconnaissance platform engineered for high-altitude operation above 3,500m — Ladakh-rated, man-portable, and rapid-deploy. Onboard AI provides real-time target tracking and classification without ground-station dependency. Tethered variant for persistent fixed-point monitoring.',
+    desc: 'Lightweight intelligence, surveillance, and reconnaissance platform engineered for high-altitude operation above 5,000m — Ladakh-rated, man-portable, and rapid-deploy. Onboard AI provides real-time target tracking and classification without ground-station dependency. Tethered variant for persistent fixed-point monitoring.',
     specs: [
-      { k: 'Altitude rating', v: '3,500m+ (Ladakh)' },
+      { k: 'Altitude rating', v: '5,000m+ (Ladakh)' },
       { k: 'Signature', v: 'Low-signature' },
       { k: 'Deployment', v: 'Man-portable' },
       { k: 'AI capability', v: 'Onboard target tracking' },
@@ -121,7 +121,7 @@ export const systems = [
       { k: 'Use', v: 'Defense (MoD exempt)' },
     ],
     features: [
-      { title: 'High-Altitude Operations', desc: 'Altitude-tuned propulsion and thermal management validated at simulated 3,500m+ density altitude — Ladakh-class environments.' },
+      { title: 'High-Altitude Operations', desc: 'Altitude-tuned propulsion and thermal management engineered for 5,000m+ density altitude — Ladakh-class environments.' },
       { title: 'Onboard AI Target Tracking', desc: 'YOLOv8 + ByteTrack real-time detection and multi-target persistence on Jetson Orin — no GCS required for track.' },
       { title: 'Tethered Persistent ISR', desc: 'Unlimited endurance tethered configuration for forward observation post and static perimeter surveillance.' },
       { title: 'Ashni Platoon Integration', desc: 'Platform sized and software-documented for integration into Ashni platoon-level drone deployment doctrine.' },

@@ -393,6 +393,8 @@ export class ExperienceWorld implements SequenceFx {
   beginPlacing(kind: PlaceKind) {
     this.phase = 'placing';
     this.placeKind = kind;
+    this.placeValid = false;
+    this.o.store.setState({ placeReady: false });
     this.reticle.group.visible = true;
   }
 

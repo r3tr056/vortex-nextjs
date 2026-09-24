@@ -303,7 +303,10 @@ export class WebXrSession implements ArSession {
     if (frame && refSpace) {
       this.updateHitTest(frame, refSpace);
       this.updateAnchor(frame, refSpace, cb);
-      const view = frame.getViewerPose(refSpace)?.views[0];
+      // Handheld AR renders a single view; camera images are per view, so a stereo (headset)
+      // session skips QR scanning and photos rather than pairing the wrong eye's image and pose.
+      const views = frame.getViewerPose(refSpace)?.views;
+      const view = views?.length === 1 ? views[0] : undefined;
       const xrCam = renderer.xr.getCamera().cameras[0] ?? renderer.xr.getCamera();
       // Raw camera access (WebXR camera-access module); not yet in the WebXR typings.
       const viewCamera = (view as (XRView & { camera?: { width: number; height: number } }) | undefined)?.camera;

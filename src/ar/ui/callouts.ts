@@ -70,7 +70,7 @@ export class CalloutLayer {
       c.resolve(tmp);
       tmp.project(camera);
       // Behind the camera, or well outside the view (a label pinned to the screen edge misleads).
-      const hidden = tmp.z > 1 || Math.abs(tmp.x) > 1.25 || Math.abs(tmp.y) > 1.25;
+      const hidden = !(Math.abs(tmp.z) <= 1) || Math.abs(tmp.x) > 1.25 || Math.abs(tmp.y) > 1.25;
       c.el.style.visibility = hidden ? 'hidden' : 'visible';
       if (hidden) continue;
       const x = (tmp.x * 0.5 + 0.5) * width;

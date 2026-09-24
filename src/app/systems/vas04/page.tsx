@@ -43,7 +43,7 @@ const SLIDES: Slide[] = [
     filter:        'brightness(0.82) contrast(1.12) saturate(1.08)',
     eyebrow:       'VAS-04 · Military ISR',
     h1:            <>Eyes above<br /><span style={{ color: GREEN }}>Ladakh.</span> Anywhere.</>,
-    sub:           'Sentinel is Vortex\'s frontline ISR platform — built for the environments India actually deploys in. 3,500 m+ altitude ceiling, man-portable by a single soldier, and onboard AI that keeps tracking targets when the GCS link goes dark.',
+    sub:           'Sentinel is Vortex\'s frontline ISR platform — built for the environments India actually deploys in. 5,000 m+ altitude ceiling, man-portable by a single soldier, and onboard AI that keeps tracking targets when the GCS link goes dark.',
     mono:          'Military ISR · Ladakh-rated',
     tags:          ['Defense (MoD exempt)', 'Ladakh-rated', 'TRL 6', 'Man-portable'],
     tagFirstClass: 'tag tag-green',
@@ -56,7 +56,7 @@ const SLIDES: Slide[] = [
     filter:        'brightness(0.88) contrast(1.08) saturate(1.05)',
     eyebrow:       'VAS-04 · Compact Form Factor',
     h1:            <>One soldier.<br /><span style={{ color: GREEN }}>Any mission.</span></>,
-    sub:           'Compact quad layout folds to single-soldier backpack dimensions without sacrificing structural rigidity at 3,500 m density altitude. T700 CF arms. PA12-CF motor mounts. Deploys in under 10 minutes.',
+    sub:           'Compact quad layout folds to single-soldier backpack dimensions without sacrificing structural rigidity at 5,000 m density altitude. T700 CF arms. PA12-CF motor mounts. Deploys in under 10 minutes.',
     mono:          'Top view · compact ISR platform',
     tags:          ['Man-portable', '<10 min deploy', 'T700 CF frame'],
     tagFirstClass: 'tag tag-green',
@@ -69,9 +69,9 @@ const SLIDES: Slide[] = [
     filter:        'brightness(0.80) contrast(1.14) saturate(1.05)',
     eyebrow:       'VAS-04 · Altitude Propulsion',
     h1:            <>Engineered for<br />where the air<br /><span style={{ color: GREEN }}>gets thin.</span></>,
-    sub:           'At 3,500 m the air is 65% sea-level density. Sentinel\'s altitude-tuned carbon fibre props and custom-wound motors are sized for those conditions specifically — not as a footnote to a sea-level platform.',
-    mono:          'Altitude-tuned propulsion · 3,500 m rated',
-    tags:          ['3,500 m+ ceiling', '38 min endurance', 'Altitude CF props'],
+    sub:           'At 5,000 m the air is barely 60% of sea-level density. Sentinel\'s altitude-tuned carbon fibre props and custom-wound motors are sized for those conditions specifically — not as a footnote to a sea-level platform.',
+    mono:          'Altitude-tuned propulsion · 5,000 m rated',
+    tags:          ['5,000 m+ ceiling', '38 min endurance', 'Altitude CF props'],
     tagFirstClass: 'tag tag-green',
     glow:          'radial-gradient(ellipse 55% 60% at 42% 50%, rgba(148,211,39,0.09) 0%, transparent 65%)',
   },
@@ -459,7 +459,7 @@ export default function SentinelPage() {
             </h2>
 
             <p style={{ fontSize: 15, color: '#7A8BA6', lineHeight: 1.8, marginBottom: 18, position: 'relative' }} className="reveal r3">
-              Sentinel&apos;s airframe is engineered around the platoon-level deployment constraint: one soldier, one backpack, ten minutes to launch. The compact quad layout folds to vehicle-portable dimensions without sacrificing the structural rigidity demanded by 3,500 m density altitude flight.
+              Sentinel&apos;s airframe is engineered around the platoon-level deployment constraint: one soldier, one backpack, ten minutes to launch. The compact quad layout folds to vehicle-portable dimensions without sacrificing the structural rigidity demanded by 5,000 m density altitude flight.
             </p>
             <p style={{ fontSize: 15, color: '#7A8BA6', lineHeight: 1.8, marginBottom: 36, position: 'relative' }} className="reveal r3">
               Every gram is deliberate. T700 carbon fibre arms. PA12-CF printed motor mounts. The result is a platform that a rifleman can carry, a section commander can operate, and a battalion can maintain.
@@ -512,13 +512,13 @@ export default function SentinelPage() {
               Engineered for<br />where the air<br /><span style={{ color: GREEN }}>gets thin.</span>
             </h2>
             <p style={{ fontSize: 15, color: '#7A8BA6', lineHeight: 1.8, marginBottom: 40 }} className="reveal r3">
-              At 3,500 m the air is 65% the density of sea level — standard props cavitate, standard motors overheat. Sentinel&apos;s altitude-tuned carbon fibre props and custom-wound motors are sized for those conditions specifically, not as a footnote.
+              At 5,000 m the air is barely 60% the density of sea level — standard props cavitate, standard motors overheat. Sentinel&apos;s altitude-tuned carbon fibre props and custom-wound motors are sized for those conditions specifically, not as a footnote.
             </p>
 
             {/* Stat tiles */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, marginBottom: 36 }}>
               {[
-                { val: '3,500 m+', key: 'Operational altitude (ASL)' },
+                { val: '5,000 m+', key: 'Operational altitude (ASL)' },
                 { val: '38 min',   key: 'Endurance at altitude' },
                 { val: '2.4 kg',   key: 'Max takeoff weight' },
                 { val: '−25–55°C', key: 'Operating temperature' },
@@ -702,7 +702,7 @@ export default function SentinelPage() {
 
             {[
               { k: 'Platform class',     v: 'Compact quadcopter' },
-              { k: 'Altitude ceiling',   v: '3,500 m+ ASL (Ladakh-rated)' },
+              { k: 'Altitude ceiling',   v: '5,000 m+ ASL (Ladakh-rated)' },
               { k: 'Hover endurance',    v: '38 min at altitude' },
               { k: 'Max takeoff weight', v: '2.4 kg' },
               { k: 'Payload',            v: 'EO / IR / dual-mode' },
@@ -786,7 +786,7 @@ export default function SentinelPage() {
               {
                 num: '01',
                 title: 'YOLOv8 Onboard Detection',
-                body: 'Real-time target detection at 30 fps on Jetson Orin Nano — personnel, vehicles, and equipment. Runs entirely onboard at 3,500 m with no GCS uplink requirement. Works in GPS-denied and comms-jammed environments.',
+                body: 'Real-time target detection at 30 fps on Jetson Orin Nano — personnel, vehicles, and equipment. Runs entirely onboard at 5,000 m with no GCS uplink requirement. Works in GPS-denied and comms-jammed environments.',
                 accent: GREEN,
                 tag: 'No GCS required',
               },

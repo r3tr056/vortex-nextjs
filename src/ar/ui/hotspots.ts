@@ -71,7 +71,7 @@ export class HotspotLayer {
       item.resolve(tmp);
       const dist = tmp.distanceTo(toCam);
       tmp.project(camera);
-      const offscreen = tmp.z > 1 || Math.abs(tmp.x) > 1.1 || Math.abs(tmp.y) > 1.1;
+      const offscreen = !(Math.abs(tmp.z) <= 1) || Math.abs(tmp.x) > 1.1 || Math.abs(tmp.y) > 1.1;
       const x = (tmp.x * 0.5 + 0.5) * width;
       const y = (-tmp.y * 0.5 + 0.5) * height;
       // Slightly smaller when far away, never below a comfortable tap size.
