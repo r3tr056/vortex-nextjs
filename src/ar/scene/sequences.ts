@@ -50,6 +50,8 @@ export interface SequenceScript {
   streaks?: [number, number];
 }
 
+// Effect windows for the stage fit. Each ends ~1 s after its "off" cue because the effect fades
+// out over about a second, and it still occupies space while it does.
 const CLIMB: [number, number] = [10, 18.5];
 // Wingmen join once the drone has turned to face the visitor (so they don't sweep the booth).
 const FLEET: [number, number] = [29.2, 34.5];

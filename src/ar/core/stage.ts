@@ -103,6 +103,10 @@ export function introExtent(c: IntroContent, drone: DroneSize, extra: Extent[] =
 
 /** The largest uniform scale (never above 1) that fits `content` inside `stage`, centred in it. */
 export function fitStage(content: Extent, stage: Extent = INTRO_STAGE): StageFit {
+  const w = content.maxX - content.minX;
+  const d = content.maxZ - content.minZ;
+  // Nothing measurable (empty path): leave it at real size, centred.
+  if (!(w > 0 && d > 0 && content.maxY > 0) || !Number.isFinite(w + d + content.maxY)) return { scale: 1, x: 0, z: 0 };
   const scale = Math.min(
     1,
     (stage.maxX - stage.minX) / (content.maxX - content.minX),

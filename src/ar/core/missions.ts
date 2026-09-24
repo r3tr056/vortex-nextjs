@@ -61,7 +61,8 @@ export type MissionEvent =
   | { type: 'complete'; success: boolean };
 
 export const LOCKON_TARGETS: LockOnTargetDef[] = [
-  // Stage space: inside the play zone in front of the standee (see core/stage.ts).
+  // Model-scale (stage) metres, not booth metres: the stage shrinks them ~0.6x, so z 1.8 lands
+  // ~1.2 m in front of the standee. core.test.ts checks each one is inside playBounds().
   { id: 't1', kind: 'vehicle', label: 'Vehicle', x: -0.9, z: 1.0 },
   { id: 't2', kind: 'radar', label: 'Radar', x: 1.0, z: 1.5 },
   { id: 't3', kind: 'person', label: 'Person', x: 0.1, z: 1.8 },
