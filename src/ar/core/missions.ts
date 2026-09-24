@@ -64,7 +64,7 @@ export const LOCKON_TARGETS: LockOnTargetDef[] = [
   // Stage space: inside the play zone in front of the standee (see core/stage.ts).
   { id: 't1', kind: 'vehicle', label: 'Vehicle', x: -0.9, z: 1.0 },
   { id: 't2', kind: 'radar', label: 'Radar', x: 1.0, z: 1.5 },
-  { id: 't3', kind: 'person', label: 'Person', x: 0.1, z: 2.1 },
+  { id: 't3', kind: 'person', label: 'Person', x: 0.1, z: 1.8 },
 ];
 
 export class LockOnMission {

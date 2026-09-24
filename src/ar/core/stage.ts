@@ -70,7 +70,7 @@ export function introExtent(c: IntroContent, drone: DroneSize, extra: Extent[] =
     e.maxY = Math.max(e.maxY, top);
   };
   const within = (t: number, w?: [number, number]) => !!w && t >= w[0] && t <= w[1];
-  for (let t = 0; t <= c.duration; t += 0.05) {
+  for (let t = 0; t <= c.duration + 1e-9; t += 0.02) {
     const s = samplePath(c.path, t);
     // + the hover bob.
     add(s.x, s.z, drone.reach, s.y + drone.height + 0.02);
@@ -124,7 +124,7 @@ export function toStage(fit: StageFit, x: number, y: number, z: number): [number
 /**
  * Flight volume for the drone's centre, in stage space: inside `box` once scaled, the props clear
  * of the standee, the top of the drone under the ceiling, and at most half a prop-reach overhang
- * at the sides.
+ * at the sides and the front.
  */
 export function playBounds(fit: StageFit, drone: DroneSize, box: Extent = PLAY_STAGE) {
   const k = fit.scale;
@@ -132,7 +132,7 @@ export function playBounds(fit: StageFit, drone: DroneSize, box: Extent = PLAY_S
     minX: (box.minX - fit.x) / k + drone.reach / 2,
     maxX: (box.maxX - fit.x) / k - drone.reach / 2,
     minZ: (box.minZ - fit.z) / k + drone.reach,
-    maxZ: (box.maxZ - fit.z) / k,
+    maxZ: (box.maxZ - fit.z) / k - drone.reach / 2,
     maxY: box.maxY / k - drone.height,
   };
 }

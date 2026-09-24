@@ -592,8 +592,10 @@ export class ClimbStreaks {
       this.seeds[i * 3 + 1] = y;
       const x = centre.x + this.seeds[i * 3];
       const z = centre.z + this.seeds[i * 3 + 2];
-      const yy = centre.y + y;
-      arr.set([x, yy, z, x, yy + S.length, z], i * 6);
+      // Never below the floor (early in the climb the ring reaches under the drone's feet).
+      const lo = Math.max(0, centre.y + y);
+      const hi = Math.max(0, centre.y + y + S.length);
+      arr.set([x, lo, z, x, hi, z], i * 6);
     }
     attr.needsUpdate = true;
     (this.lines.material as LineBasicMaterial).opacity = 0.22 * this.strength;

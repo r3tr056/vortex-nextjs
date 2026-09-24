@@ -94,7 +94,7 @@ export class HotspotLayer {
     }
     // The drone is a scale model, so parts sit close together on screen: nudge overlapping
     // buttons apart (recomputed from the true positions every frame, so nothing drifts).
-    for (let pass = 0; pass < 3; pass++) {
+    for (let pass = 0; pass < 6; pass++) {
       for (let i = 0; i < placed.length; i++) {
         for (let j = i + 1; j < placed.length; j++) {
           const a = placed[i];
@@ -118,6 +118,9 @@ export class HotspotLayer {
       }
     }
     for (const p of placed) {
+      // A nudge must not push a button off the screen.
+      p.x = Math.min(width - MIN_GAP / 2, Math.max(MIN_GAP / 2, p.x));
+      p.y = Math.min(height - MIN_GAP / 2, Math.max(MIN_GAP / 2, p.y));
       p.el.style.transform = `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) scale(${p.s.toFixed(2)})`;
       p.el.style.visibility = p.hidden ? 'hidden' : 'visible';
     }
