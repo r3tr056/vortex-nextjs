@@ -152,12 +152,12 @@ export default function HeroCarousel() {
       </div>
 
       <div className="hero-bottom">
-        <div className="hero-stats" aria-label="Market context">
+        <div className="hero-stats" aria-label="Capability at a glance">
           {[
-            { val: '₹40k', unit: ' Cr', key: 'Post-Sindoor procurement' },
-            { val: '50', unit: 'k', key: 'Army annual demand' },
-            { val: '28', unit: '%', key: 'Agri market CAGR' },
-            { val: '71', unit: '%', key: 'TC rejection rate' },
+            { val: '06', unit: '', key: 'Autonomous platforms' },
+            { val: 'TRL', unit: ' 6', key: 'Demonstrated, not simulated' },
+            { val: 'L1', unit: '–L5', key: 'Native stack layers' },
+            { val: '0', unit: '', key: 'Chinese components' },
           ].map((s, idx) => (
             <motion.div 
               key={s.key} 

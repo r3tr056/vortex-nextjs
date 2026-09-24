@@ -123,7 +123,7 @@ export function HeroSectionExample() {
         <Stack gap="lg">
           <BodyText variant="lg">
             From 25 kg logistics to swarm operations — Vortex Autonomous Systems
-            engineers the autonomous infrastructure that India's next conflict,
+            engineers the autonomous infrastructure that India&apos;s next conflict,
             next harvest, and next disaster response depends on.
           </BodyText>
           <Flex gap="md" wrap>
@@ -148,7 +148,7 @@ export function MetricsSectionExample() {
     { value: '25', unit: ' kg', label: 'Maximum payload', sub: 'VAS-01 Atlas' },
     { value: '0', unit: '', label: 'Chinese-origin components', sub: 'Across all platforms' },
     { value: '70', unit: '%', label: 'Made-in-India content', sub: 'Across the full stack' },
-    { value: '3,500', unit: ' m', label: 'Operational altitude', sub: 'Sentinel high-alt ISR' },
+    { value: '5,000', unit: ' m', label: 'Operational altitude', sub: 'Sentinel high-alt ISR' },
     { value: '10+', unit: '', label: 'Drones per swarm', sub: 'Single-operator Hornet' },
     { value: '30', unit: ' min', label: 'Endurance at max payload', sub: 'Atlas Logistics' },
     { value: '∞', unit: '', label: 'Endurance · Ranger tethered', sub: 'No battery constraint' },

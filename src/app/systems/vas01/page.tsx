@@ -118,8 +118,7 @@ export default function AtlasPage() {
   const startRef  = useRef<number>(0);
   const pausedRef = useRef(false);
 
-  /* ── smooth progress bar ── */
-  const tickProgress = useCallback(() => {
+  function tickProgress() {
     if (pausedRef.current) return;
     const elapsed = performance.now() - startRef.current;
     const pct = Math.min((elapsed / INTERVAL) * 100, 100);
@@ -127,10 +126,11 @@ export default function AtlasPage() {
     if (pct < 100) {
       rafRef.current = requestAnimationFrame(tickProgress);
     }
-  }, []);
+  }
 
   const goTo = useCallback((idx: number) => {
     if (idx === active) return;
+    setProgress(0);
     setPrev(active);
     setFading(true);
     setTimeout(() => {
@@ -148,7 +148,6 @@ export default function AtlasPage() {
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearTimeout(timerRef.current);
-    setProgress(0);
     startRef.current = performance.now();
     rafRef.current   = requestAnimationFrame(tickProgress);
     timerRef.current = setTimeout(advance, INTERVAL);
@@ -244,12 +243,12 @@ export default function AtlasPage() {
             position: 'absolute', top: 72, left: 0, right: 0, zIndex: 6,
             padding: '14px 56px', display: 'flex', alignItems: 'center',
             background: 'linear-gradient(to bottom, rgba(6,8,13,0.72) 0%, transparent 100%)',
-          }}>
+          }} className="sys-pad">
             <Link href="/systems" className="hero-back-link"><span>←</span> Back to Systems</Link>
           </div>
 
           {/* ── Hero text (transitions with slide) ── */}
-          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }}>
+          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }} className="sys-pad sys-hero-pad">
 
             {/* eyebrow */}
             <div
@@ -309,7 +308,7 @@ export default function AtlasPage() {
           <div style={{
             position: 'absolute', bottom: 48, left: 56, zIndex: 6,
             display: 'flex', flexDirection: 'column', gap: 16,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-left">
             {/* Mono label */}
             <div
               key={`mono-${active}`}
@@ -357,7 +356,7 @@ export default function AtlasPage() {
           <div style={{
             position: 'absolute', bottom: 44, right: 56, zIndex: 6,
             display: 'flex', gap: 8,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-right">
             {[
               { label: '←', fn: () => goTo((active - 1 + SLIDES.length) % SLIDES.length) },
               { label: '→', fn: () => goTo((active + 1) % SLIDES.length) },
@@ -408,7 +407,7 @@ export default function AtlasPage() {
             <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', background: `radial-gradient(ellipse 60% 65% at 50% 52%, ${GREEN_DIM} 0%, transparent 70%)` }} />
 
             {/* Section label — top left */}
-            <div style={{ position: 'absolute', top: 28, left: 56, zIndex: 4 }} className="reveal r1">
+            <div style={{ position: 'absolute', top: 28, left: 56, zIndex: 4 }} className="reveal r1 sys-overlay-label">
               <div className="eyebrow" style={{ marginBottom: 0 }}>Airframe Design · VAS-01</div>
             </div>
 
@@ -427,12 +426,12 @@ export default function AtlasPage() {
 
             {/* ── Spec overlay cards ── */}
             {/* Left column — top */}
-            <div style={{ position: 'absolute', top: '18%', left: 40, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ position: 'absolute', top: '18%', left: 40, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 10 }} className="sys-overlay">
               {[
                 { label: 'Configuration', val: 'Symmetric hexacopter', sub: '6-arm · 6-motor' },
                 { label: 'Frame material', val: 'T700 carbon fibre', sub: 'CNC-machined arms' },
               ].map((c) => (
-                <div key={c.label} style={{ background: 'rgba(6,8,13,0.78)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 190 }} className="reveal r2">
+                <div key={c.label} style={{ background: 'rgba(6,8,13,0.78)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 190 }} className="reveal r2 sys-overlay-card">
                   <Mono>{c.label}</Mono>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 600, color: '#E4EAF4', marginTop: 5, lineHeight: 1 }}>{c.val}</div>
                   <div style={{ fontSize: 11, color: '#52607A', marginTop: 4 }}>{c.sub}</div>
@@ -441,12 +440,12 @@ export default function AtlasPage() {
             </div>
 
             {/* Right column — top */}
-            <div style={{ position: 'absolute', top: '18%', right: 40, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }}>
+            <div style={{ position: 'absolute', top: '18%', right: 40, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }} className="sys-overlay">
               {[
                 { label: 'Payload bay', val: 'Universal quick-release', sub: 'Centre-CoG · modular' },
                 { label: 'Fold-arm system', val: 'Vehicle-portable', sub: 'Deploy in <5 min' },
               ].map((c) => (
-                <div key={c.label} style={{ background: 'rgba(6,8,13,0.78)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 190, textAlign: 'right' }} className="reveal r2">
+                <div key={c.label} style={{ background: 'rgba(6,8,13,0.78)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 190, textAlign: 'right' }} className="reveal r2 sys-overlay-card">
                   <Mono>{c.label}</Mono>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 600, color: '#E4EAF4', marginTop: 5, lineHeight: 1 }}>{c.val}</div>
                   <div style={{ fontSize: 11, color: '#52607A', marginTop: 4 }}>{c.sub}</div>
@@ -455,7 +454,7 @@ export default function AtlasPage() {
             </div>
 
             {/* Bottom stat strip — overlaid above bottom fade */}
-            <div style={{ position: 'absolute', bottom: 24, left: 56, right: 56, zIndex: 3, display: 'flex', gap: 4 }}>
+            <div style={{ position: 'absolute', bottom: 24, left: 56, right: 56, zIndex: 3, display: 'flex', gap: 4 }} className="sys-overlay-strip">
               {[
                 { val: '25 kg',    key: 'Lift capacity' },
                 { val: '30 min',   key: 'Endurance' },
@@ -472,7 +471,7 @@ export default function AtlasPage() {
           </div>
 
           {/* Brief descriptor line below image */}
-          <div style={{ padding: '20px 56px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderTop: `1px solid ${LINE}` }}>
+          <div style={{ padding: '20px 56px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderTop: `1px solid ${LINE}` }} className="sys-pad">
             <p style={{ fontSize: 13, color: '#52607A', lineHeight: 1.7, maxWidth: 620 }}>
               Atlas is engineered from the payload outward — symmetric hex geometry distributes 25 kg loads evenly across six arms, delivering 30-minute endurance across desert, high-altitude, and tropical terrain. Intelligent AI autonomy, IP53 multi-environment rating, and fold-arm portability make it operable by a two-person crew with zero pre-flight tools.
             </p>
@@ -508,7 +507,7 @@ export default function AtlasPage() {
           </div>
 
           {/* Text — left */}
-          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }} className="sys-pad sys-pad-y">
             <div className="eyebrow reveal r1">Structural Engineering</div>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(38px, 5vw, 68px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', marginBottom: 24, color: '#E4EAF4' }} className="reveal r2">
               The frame that<br />carries what<br /><span style={{ color: GREEN }}>others won&apos;t.</span>
@@ -548,7 +547,7 @@ export default function AtlasPage() {
             Full-bleed cinematic · carbon fibre payload bay
             green rim light · modular payload story
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '75vh', overflow: 'hidden', background: BG }}>
+        <section style={{ padding: 0, position: 'relative', height: '75vh', overflow: 'hidden', background: BG }} className="sys-scene">
           <Image
             src="/systems/atlas/atlas_payload_box.png"
             alt="Atlas modular carbon fibre payload bay — close-up"
@@ -563,7 +562,7 @@ export default function AtlasPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to left, rgba(6,8,13,0.94) 0%, rgba(6,8,13,0.65) 28%, transparent 55%)` }} />
 
           {/* Text — bottom right */}
-          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 440, textAlign: 'right' }}>
+          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 440, textAlign: 'right' }} className="sys-scene-text">
             <Mono color={GREEN}>Modular Payload Bay · Quick-Release</Mono>
             <div style={{ height: 16 }} />
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(26px, 3.5vw, 48px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.01em', color: '#E4EAF4' }}>
@@ -575,7 +574,7 @@ export default function AtlasPage() {
           </div>
 
           {/* Payload mode strip — bottom left */}
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 14 }} className="sys-scene-text">
             {[
               { val: 'Cargo box',  key: 'Standard logistics' },
               { val: 'Medevac',    key: 'Medical evacuation' },
@@ -596,7 +595,7 @@ export default function AtlasPage() {
             §5  FIELD SCENE — atlas_rough.png
             Full-bleed outdoor · golden hour · atmospheric
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '70vh', overflow: 'hidden', background: BG2 }}>
+        <section style={{ padding: 0, position: 'relative', height: '70vh', overflow: 'hidden', background: BG2 }} className="sys-scene">
           <Image
             src="/systems/atlas/atlas_rough.png"
             alt="Atlas deployed in field — golden hour terrain"
@@ -610,7 +609,7 @@ export default function AtlasPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to right, rgba(6,8,13,0.85) 0%, transparent 35%, transparent 65%, rgba(6,8,13,0.85) 100%)` }} />
 
           {/* Caption — bottom left */}
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }} className="sys-scene-text">
             <Mono color="rgba(148,211,39,0.8)">Field Deployment · Last-Mile Logistics</Mono>
             <div style={{ height: 14 }} />
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(28px, 3.5vw, 52px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.01em', color: '#E4EAF4' }}>
@@ -626,10 +625,10 @@ export default function AtlasPage() {
             §6  SPECS — id="specs"
             Left = 12-row spec table · Right = atlas_solo.png
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} id="specs">
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split" id="specs">
 
           {/* Spec table */}
-          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-pad sys-pad-y">
             <div style={{ position: 'absolute', top: 0, right: 0, width: '60%', height: '50%', background: `radial-gradient(ellipse 80% 80% at 80% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
             <div className="eyebrow reveal r1" style={{ position: 'relative' }}>Technical Specifications</div>
@@ -664,7 +663,7 @@ export default function AtlasPage() {
           </div>
 
           {/* Side image — atlas_solo with green glow payload */}
-          <div style={{ position: 'relative', minHeight: 600, overflow: 'hidden', background: BG }}>
+          <div style={{ position: 'relative', minHeight: 600, overflow: 'hidden', background: BG }} className="sys-media">
             <Image
               src="/systems/atlas/atlas_solo.png"
               alt="Atlas VAS-01 three-quarter view with payload"
@@ -689,7 +688,7 @@ export default function AtlasPage() {
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
           {/* Header */}
-          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }}>
+          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }} className="sys-pad sys-pad-y">
             <div>
               <div className="eyebrow reveal r1">Mission Configurations</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
@@ -702,7 +701,7 @@ export default function AtlasPage() {
           </div>
 
           {/* Two mission images side by side */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }} className="sys-grid-2">
             {[
               {
                 src: '/systems/atlas/atlas_hero2.png',
@@ -744,7 +743,7 @@ export default function AtlasPage() {
           </div>
 
           {/* 4 capability cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }} className="sys-grid-4">
             {[
               {
                 title: 'Forward Resupply',
@@ -767,7 +766,7 @@ export default function AtlasPage() {
                 accent: GREEN,
               },
             ].map((f) => (
-              <div key={f.title} style={{ background: BG2, padding: '36px 32px', borderTop: `2px solid ${f.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={f.title} style={{ background: BG2, padding: '36px 32px', borderTop: `2px solid ${f.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 64, background: `linear-gradient(to bottom, ${f.accent === GREEN ? GREEN_DIM : RED_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 600, color: '#E4EAF4', marginBottom: 12, position: 'relative' }}>{f.title}</div>
                 <p style={{ fontSize: 13, color: '#52607A', lineHeight: 1.72, position: 'relative' }}>{f.body}</p>
@@ -794,7 +793,7 @@ export default function AtlasPage() {
             <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: `linear-gradient(to right, ${BG2} 0%, transparent 40%)` }} />
           </div>
 
-          <div style={{ position: 'relative', zIndex: 2, padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+          <div style={{ position: 'relative', zIndex: 2, padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }} className="sys-split sys-pad sys-pad-y">
             {/* Green glow */}
             <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '60%', background: `radial-gradient(ellipse 80% 80% at 10% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
@@ -839,7 +838,7 @@ export default function AtlasPage() {
 
 
         {/* Prev / Next nav */}
-        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }}>
+        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }} className="sys-pad">
           <Link href="/systems" className="btn-outline">← All Platforms</Link>
           <Link href="/systems" className="btn-arrow" style={{ color: '#52607A' }}>
             All platforms <span className="arr">→</span>

@@ -23,17 +23,15 @@ export default function Nav() {
     return () => document.body.classList.remove('menu-open');
   }, [menuOpen]);
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <>
       <nav id="nav" aria-label="Primary">
-        <Link href="/" className="nav-logo" aria-label="Vortex Autonomous Systems — home">
+        <Link href="/" className="nav-logo" aria-label="Vortex Autonomous Systems — home" onClick={closeMenu}>
           <Image
             src="/vortex_logo.png"
             alt="Vortex Autonomous Systems"
@@ -68,7 +66,7 @@ export default function Nav() {
           </Link>
           <button
             className="mobile-nav-toggle"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => setMenuOpen((open) => !open)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
@@ -99,7 +97,7 @@ export default function Nav() {
           <Link
             key={link.href}
             href={link.href}
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
             className={isActive(link.href) ? 'active' : ''}
             aria-current={isActive(link.href) ? 'page' : undefined}
           >
@@ -110,7 +108,7 @@ export default function Nav() {
           href="/partner#contact-form"
           className="btn-primary"
           style={{ marginTop: 28, alignSelf: 'flex-start' }}
-          onClick={() => setMenuOpen(false)}
+          onClick={closeMenu}
         >
           Request Briefing <span className="arr">→</span>
         </Link>

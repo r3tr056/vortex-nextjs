@@ -21,7 +21,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       variant = 'default',
       glow = 'none',
       hoverBorder = false,
-      accentColor = colors.green,
+      accentColor,
       children,
       style,
       ...props
@@ -50,10 +50,11 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn('card', `card-${variant}`, className)}
+        className={cn('card', `card-${variant}`, hoverBorder && 'card-accent', className)}
         style={{
           padding: `${spacing.cardPadding} ${spacing.cardPaddingX}`,
-          borderTop: hoverBorder ? `2px solid transparent` : undefined,
+          // .card-accent lights the top border on hover, in this colour when one is given.
+          ...(accentColor ? ({ '--card-accent': accentColor } as React.CSSProperties) : null),
           transition: hoverBorder ? 'border-color 0.2s, background 0.2s' : undefined,
           position: 'relative',
           overflow: 'hidden',

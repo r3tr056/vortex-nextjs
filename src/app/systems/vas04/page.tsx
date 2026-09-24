@@ -141,8 +141,7 @@ export default function SentinelPage() {
   const startRef  = useRef<number>(0);
   const pausedRef = useRef(false);
 
-  /* ── smooth progress bar ── */
-  const tickProgress = useCallback(() => {
+  function tickProgress() {
     if (pausedRef.current) return;
     const elapsed = performance.now() - startRef.current;
     const pct = Math.min((elapsed / INTERVAL) * 100, 100);
@@ -150,10 +149,11 @@ export default function SentinelPage() {
     if (pct < 100) {
       rafRef.current = requestAnimationFrame(tickProgress);
     }
-  }, []);
+  }
 
   const goTo = useCallback((idx: number) => {
     if (idx === active) return;
+    setProgress(0);
     setPrev(active);
     setFading(true);
     setTimeout(() => {
@@ -171,7 +171,6 @@ export default function SentinelPage() {
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearTimeout(timerRef.current);
-    setProgress(0);
     startRef.current = performance.now();
     rafRef.current   = requestAnimationFrame(tickProgress);
     timerRef.current = setTimeout(advance, INTERVAL);
@@ -270,14 +269,14 @@ export default function SentinelPage() {
             position: 'absolute', top: 72, left: 0, right: 0, zIndex: 6,
             padding: '14px 56px', display: 'flex', alignItems: 'center',
             background: 'linear-gradient(to bottom, rgba(6,8,13,0.72) 0%, transparent 100%)',
-          }}>
+          }} className="sys-pad">
             <Link href="/systems" className="hero-back-link">
               <span>←</span> Back to Systems
             </Link>
           </div>
 
           {/* ── Hero text (transitions with slide) ── */}
-          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }}>
+          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }} className="sys-pad sys-hero-pad">
 
             {/* eyebrow */}
             <div
@@ -337,7 +336,7 @@ export default function SentinelPage() {
           <div style={{
             position: 'absolute', bottom: 48, left: 56, zIndex: 6,
             display: 'flex', flexDirection: 'column', gap: 16,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-left">
             {/* Mono caption */}
             <div
               key={`mono-${active}`}
@@ -385,7 +384,7 @@ export default function SentinelPage() {
           <div style={{
             position: 'absolute', bottom: 44, right: 56, zIndex: 6,
             display: 'flex', gap: 8,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-right">
             {[
               { label: '←', fn: () => goTo((active - 1 + SLIDES.length) % SLIDES.length) },
               { label: '→', fn: () => goTo((active + 1) % SLIDES.length) },
@@ -427,10 +426,10 @@ export default function SentinelPage() {
             §2  TOP VIEW — FORM FACTOR & AIRFRAME
             Left = image · Right = text · BG2 base
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '80vh', background: BG2, borderBottom: `1px solid ${LINE}` }}>
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '80vh', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split">
 
           {/* Image column */}
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 560 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 560 }} className="sys-media">
             <Image
               src="/systems/sentinel/sentinel_top_view.png"
               alt="Sentinel VAS-04 top view — compact ISR form factor"
@@ -450,7 +449,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Text column */}
-          <div style={{ padding: '80px 64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: `1px solid ${LINE}`, background: BG2, position: 'relative' }}>
+          <div style={{ padding: '80px 64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: `1px solid ${LINE}`, background: BG2, position: 'relative' }} className="sys-pad sys-pad-y">
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `radial-gradient(ellipse 80% 55% at 82% 28%, ${GREEN_DIM} 0%, transparent 70%)` }} />
 
             <div className="eyebrow reveal r1" style={{ position: 'relative' }}>Airframe Design</div>
@@ -506,7 +505,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Text — left */}
-          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }} className="sys-pad sys-pad-y">
             <div className="eyebrow reveal r1">Altitude-Tuned Propulsion</div>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(38px, 5vw, 68px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', marginBottom: 24, color: '#E4EAF4' }} className="reveal r2">
               Engineered for<br />where the air<br /><span style={{ color: GREEN }}>gets thin.</span>
@@ -548,7 +547,7 @@ export default function SentinelPage() {
             §4  CAMERA MACRO — SENSOR PAYLOAD
             Full-bleed cinematic · amber accent · sensor story
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '78vh', overflow: 'hidden', background: BG }}>
+        <section style={{ padding: 0, position: 'relative', height: '78vh', overflow: 'hidden', background: BG }} className="sys-scene">
           <Image
             src="/systems/sentinel/sentinel_camera_macro.png"
             alt="Sentinel EO/IR camera payload — target acquisition system"
@@ -566,7 +565,7 @@ export default function SentinelPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to left, rgba(6,8,13,0.92) 0%, rgba(6,8,13,0.60) 30%, transparent 58%)` }} />
 
           {/* Text — bottom right */}
-          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 460, textAlign: 'right' }}>
+          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 460, textAlign: 'right' }} className="sys-scene-text">
             <MonoLabel color={AMBER}>EO/IR Payload · Target Acquisition</MonoLabel>
             <div style={{ height: 16 }} />
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(28px, 3.5vw, 50px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.01em', color: '#E4EAF4' }}>
@@ -578,7 +577,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Sensor stat strip — bottom left */}
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 16 }} className="sys-scene-text">
             {[
               { val: 'EO + IR', key: 'Dual payload' },
               { val: 'YOLOv8', key: 'Onboard detection' },
@@ -603,7 +602,7 @@ export default function SentinelPage() {
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
           {/* Header */}
-          <div style={{ padding: '80px 56px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, borderBottom: `1px solid ${LINE}` }}>
+          <div style={{ padding: '80px 56px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, borderBottom: `1px solid ${LINE}` }} className="sys-split sys-pad sys-pad-y">
             <div>
               <div className="eyebrow reveal r1">System Architecture</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(36px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 0.91, letterSpacing: '-0.01em', color: '#E4EAF4' }} className="reveal r2">
@@ -632,7 +631,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Three annotation cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: LINE }} className="sys-grid-3">
             {[
               {
                 layer: 'Propulsion layer',
@@ -653,7 +652,7 @@ export default function SentinelPage() {
                 accent: AMBER,
               },
             ].map((item) => (
-              <div key={item.title} style={{ background: BG2, padding: '40px 36px', borderTop: `2px solid ${item.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={item.title} style={{ background: BG2, padding: '40px 36px', borderTop: `2px solid ${item.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to bottom, ${item.accent === AMBER ? AMBER_DIM : GREEN_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 <div style={{ marginBottom: 20, position: 'relative' }}><MonoLabel>{item.layer}</MonoLabel></div>
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 600, color: '#E4EAF4', marginBottom: 14, position: 'relative' }}>{item.title}</div>
@@ -663,7 +662,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Component manifest — 4 cols */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE, borderTop: `1px solid ${LINE}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE, borderTop: `1px solid ${LINE}` }} className="sys-grid-4 sys-grid-dense">
             {[
               { component: 'Cube Orange Plus', role: 'Autopilot · triple IMU',    layer: 'Core plate',  accent: GREEN },
               { component: 'Jetson Orin Nano', role: 'AI edge compute',           layer: 'Compute stack', accent: AMBER },
@@ -674,7 +673,7 @@ export default function SentinelPage() {
               { component: 'Drone ID Tag',     role: 'DGCA Digital Sky',          layer: 'Core plate',   accent: GREEN },
               { component: 'ADS-B Out',        role: 'Airspace broadcast',        layer: 'Core plate',   accent: GREEN },
             ].map((c) => (
-              <div key={c.component} style={{ background: BG, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 6 }} className="reveal r3">
+              <div key={c.component} style={{ background: BG, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 6 }} className="reveal r3 sys-card">
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 17, fontWeight: 600, color: '#E4EAF4' }}>{c.component}</div>
                 <div style={{ fontSize: 12, color: '#52607A' }}>{c.role}</div>
                 <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: c.accent, marginTop: 4 }}>{c.layer}</div>
@@ -688,10 +687,10 @@ export default function SentinelPage() {
             §6  SPECS + ON-BOX DEPLOYMENT
             Left = spec table · Right = sentinel_on_box image
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} id="specs">
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split" id="specs">
 
           {/* Specs column */}
-          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-pad sys-pad-y">
             {/* Green glow top-right */}
             <div style={{ position: 'absolute', top: 0, right: 0, width: '60%', height: '50%', background: `radial-gradient(ellipse 80% 80% at 80% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
@@ -727,7 +726,7 @@ export default function SentinelPage() {
           </div>
 
           {/* Deployment image — sentinel on its carry box */}
-          <div style={{ position: 'relative', minHeight: 600, overflow: 'hidden', background: BG, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ position: 'relative', minHeight: 600, overflow: 'hidden', background: BG, display: 'flex', flexDirection: 'column' }} className="sys-media">
             <Image
               src="/systems/sentinel/sentinel_on_box.png"
               alt="Sentinel packed for deployment on carry case"
@@ -768,7 +767,7 @@ export default function SentinelPage() {
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
           {/* Header */}
-          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }}>
+          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }} className="sys-pad sys-pad-y">
             <div>
               <div className="eyebrow reveal r1">Autonomous Intelligence</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
@@ -781,7 +780,7 @@ export default function SentinelPage() {
           </div>
 
           {/* 4 capability cards — 2×2 grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: LINE }} className="sys-grid-2">
             {[
               {
                 num: '01',
@@ -812,7 +811,7 @@ export default function SentinelPage() {
                 tag: 'Unlimited endurance',
               },
             ].map((f) => (
-              <div key={f.title} style={{ background: BG2, padding: '44px 40px', borderTop: `2px solid ${f.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={f.title} style={{ background: BG2, padding: '44px 40px', borderTop: `2px solid ${f.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to bottom, ${f.accent === AMBER ? AMBER_DIM : GREEN_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 {/* Number */}
                 <div style={{ position: 'absolute', top: 36, right: 40, fontFamily: "'Barlow Condensed', sans-serif", fontSize: 72, fontWeight: 800, lineHeight: 1, color: 'rgba(255,255,255,0.03)', userSelect: 'none' }}>{f.num}</div>
@@ -833,7 +832,7 @@ export default function SentinelPage() {
             §8  CTA — PROCUREMENT
             BG2 · green identity · two-col layout
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: BG2, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+        <section style={{ padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: BG2, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-split sys-pad sys-pad-y">
           {/* Green glow top-left */}
           <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '60%', background: `radial-gradient(ellipse 80% 80% at 10% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
@@ -877,7 +876,7 @@ export default function SentinelPage() {
 
 
         {/* Prev / Next navigation */}
-        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }}>
+        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }} className="sys-pad">
           <Link href="/systems/vas03" className="btn-outline">← VAS-03 · Ranger</Link>
           <Link href="/systems" className="btn-arrow" style={{ color: '#52607A' }}>
             All platforms <span className="arr">→</span>

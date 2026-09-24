@@ -7,50 +7,52 @@
 // COLOR PALETTE
 // ══════════════════════════════════════════════════════════
 
+// Canonical source of truth: mirrors globals.css :root (Design System v2).
+// Keep these in sync with the CSS custom properties — one palette, site-wide.
 export const colors = {
-  // Backgrounds
+  // Backgrounds  (→ --bg / --surface / --surface-2)
   bg: '#06080D',
-  bg2: '#0A0E16',
-  bg3: '#0F1520',
+  bg2: '#0B0F17',
+  bg3: '#10161F',
 
-  // Borders
-  border: 'rgba(255,255,255,0.07)',
-  borderG: 'rgba(148,211,39,0.18)',
-  borderB: 'rgba(56,182,255,0.18)',
-  line: 'rgba(255,255,255,0.06)',
+  // Borders  (→ --line / --line-2)
+  border: 'rgba(255,255,255,0.11)',
+  borderG: 'rgba(184,224,67,0.30)',
+  borderB: 'rgba(94,184,240,0.30)',
+  line: 'rgba(255,255,255,0.055)',
 
-  // Brand Colors
-  green: '#94d327',
-  greenHover: '#a8e832',
-  greenDim: 'rgba(148,211,39,0.08)',
-  greenGlow: 'rgba(148,211,39,0.14)',
+  // Brand — signature lime  (→ --accent / --accent-2)
+  green: '#B8E043',
+  greenHover: '#c9ed5a',
+  greenDim: 'rgba(184,224,67,0.08)',
+  greenGlow: 'rgba(184,224,67,0.14)',
 
-  blue: '#38b6ff',
-  blueDim: 'rgba(56,182,255,0.08)',
+  blue: '#5EB8F0',
+  blueDim: 'rgba(94,184,240,0.08)',
 
-  red: '#e84141',
-  redDim: 'rgba(232,65,65,0.06)',
-  redBorder: 'rgba(232,65,65,0.22)',
+  red: '#E85541',
+  redDim: 'rgba(232,85,65,0.08)',
+  redBorder: 'rgba(232,85,65,0.30)',
 
-  // Agriculture/Civil
+  // Agriculture/Civil  (→ --warn)
   agri: '#FFB830',
-  agriDim: 'rgba(255,184,48,0.06)',
-  agriBorder: 'rgba(255,184,48,0.3)',
+  agriDim: 'rgba(255,184,48,0.08)',
+  agriBorder: 'rgba(255,184,48,0.30)',
 
   // Restricted
   restricted: '#FF5533',
-  restrictedDim: 'rgba(255,85,51,0.06)',
-  restrictedBorder: 'rgba(255,85,51,0.3)',
+  restrictedDim: 'rgba(255,85,51,0.08)',
+  restrictedBorder: 'rgba(255,85,51,0.30)',
 
-  // Text Colors
-  text: '#E4EAF4',
+  // Text  (→ --text / --sub / --muted, AA-tuned)
+  text: '#EEF2F8',
   textSecondary: '#C8D8E8',
-  sub: '#7A8BA6',
-  muted: '#52607A',
+  sub: '#A2B0C4',
+  muted: '#6B7993',
 
   // Utility
-  selection: 'rgba(148,211,39,1)',
-  selectionText: '#000',
+  selection: 'rgba(184,224,67,1)',
+  selectionText: '#0A0F0A',
 } as const;
 
 // ══════════════════════════════════════════════════════════

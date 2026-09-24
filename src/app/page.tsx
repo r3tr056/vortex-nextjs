@@ -3,66 +3,79 @@
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import HeroCarousel from '@/components/HeroCarousel';
+import IntelStrip from '@/components/IntelStrip';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { systems, capabilityLayers, timeline, values } from '@/data';
 
-const highlightCategories = [
+/* ─────────────────────────────────────────────
+   Narrative content
+───────────────────────────────────────────── */
+
+// THE GAP — why this company exists, now.
+const gapStats = [
   {
-    id: 'defence',
-    tag: 'Military',
-    tagClass: 'tag-green',
-    name: 'Defence & Security',
-    pitch: 'High-altitude ISR, loitering munitions, and medevac for forward positions.',
-    specs: [{ k: 'Altitude', v: '3,500 m+' }, { k: 'Compliance', v: 'MoD Exempt' }],
-    example: 'Sentinel & Atlas Series'
+    num: '₹40k', unit: ' Cr',
+    cap: 'Indian UAV procurement budget unlocked post-Operation Sindoor — the largest indigenous air-systems push in a generation.',
+    src: 'MoD · 2025',
   },
   {
-    id: 'enterprise',
-    tag: 'Civil',
-    tagClass: 'tag-agri',
-    name: 'Enterprise & Mapping',
-    pitch: 'Precision agriculture, structural survey, and logistics where roads end.',
-    specs: [{ k: 'Payload', v: 'Up to 25kg' }, { k: 'Endurance', v: 'Extended' }],
-    example: 'Ranger & Atlas Ag'
+    num: '50', unit: 'k',
+    cap: "The Army's projected annual small-UAV demand — against a supply base still dependent on foreign sub-systems.",
+    src: 'Army Design Bureau',
   },
   {
-    id: 'swarm',
-    tag: 'Swarm',
-    tagClass: 'tag-blue',
-    name: 'Autonomous Swarm',
-    pitch: 'Single-operator control of 10–15 drones. Mesh-networked edge AI.',
-    specs: [{ k: 'Control', v: '1-to-15' }, { k: 'Network', v: 'Mesh / No Cloud' }],
-    example: 'Hornet Systems'
-  }
+    num: '71', unit: '%',
+    cap: 'Type-Certification rejection rate for agri-drones — most fail on traceable, compliant, indigenous supply chains.',
+    src: 'DGCA · NTH',
+  },
 ];
 
-const whyVortex = [
+// THE PLATFORMS — grouped by mission family, sourced from the catalog.
+const byId = Object.fromEntries(systems.map((s) => [s.id, s]));
+const domains = [
   {
-    num: '01', title: 'Zero-Chinese BOM',
-    body: 'Every component verified before procurement, protecting supply chains from systemic risk.',
+    title: 'Defence & Strike',
+    meta: '03 platforms · MoD-exempt',
+    ids: ['vas04', 'vas05', 'vas06'],
   },
   {
-    num: '02', title: 'One Native Stack',
-    body: 'Airframe, flight control, edge AI, and Cloud GCS — developed in-house with Indian data sovereignty.',
+    title: 'Industry & Civil',
+    meta: '03 platforms · GeM-listed',
+    ids: ['vas03', 'vas01', 'vas02'],
   },
-  {
-    num: '03', title: 'Flight-Proven TRL 6',
-    body: 'Not a render. Six operational platforms demonstrated in extreme environments, ready for audit.',
-  }
 ];
 
-// Motion variants for scroll animations
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const } }
+// THE PROOF — credibility at a glance.
+const proof = [
+  { k: 'TRL 6', v: 'All six platforms' },
+  { k: '0', v: 'Chinese components', g: true },
+  { k: '70%', v: 'Made in India' },
+  { k: 'DPIIT', v: 'Recognised startup' },
+  { k: 'iDEX', v: '2026 applicant' },
+  { k: 'GeM', v: 'Registered vendor' },
+];
+
+/* ── Motion ── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const } },
 };
-const staggerContainer = {
+const stagger = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
+const viewport = { once: true, margin: '-80px' } as const;
+
+function Chapter({ num, label, center }: { num: string; label: string; center?: boolean }) {
+  return (
+    <span className={`chapter${center ? ' chapter-center' : ''}`}>
+      <span className="chapter-num">{num}</span>
+      <span className="chapter-rule" />
+      {label}
+    </span>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -72,91 +85,182 @@ export default function HomePage() {
       <main id="main">
         <HeroCarousel />
 
-        {/* Lighter, clearer positioning section */}
-        <section className="section" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)', position: 'relative' }}>
-          <div className="ambient-center" />
-          <motion.div 
-            className="container" 
-            style={{ maxWidth: 900, textAlign: 'center', position: 'relative' }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.span variants={fadeInUp} className="eyebrow" style={{ justifyContent: 'center' }}>
-              Our Mission
-            </motion.span>
-            <motion.h2 variants={fadeInUp} className="h2" style={{ marginBottom: 32 }}>
-              Building the indigenous drone ecosystem.<br />
-              <span className="g">From silicon to sky.</span>
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="body-lg" style={{ margin: '0 auto 48px', maxWidth: 640 }}>
-              Vortex builds autonomous UAV platforms for Indian defence, government, and
-              precision industry. One unified stack. In-house firmware. Zero reliance on high-risk supply chains.
+        {/* ═══ 01 · THE GAP ═══ */}
+        <section className="section" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}>
+          <div className="ambient-tl" />
+          <motion.div className="container" style={{ position: 'relative' }} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <div className="story-head">
+              <motion.div variants={fadeUp}>
+                <Chapter num="01" label="The Gap" />
+                <h2 className="h2" style={{ marginBottom: 0 }}>
+                  India can design the mission.<br />
+                  <span className="g">The supply chain is the front line.</span>
+                </h2>
+              </motion.div>
+              <motion.p variants={fadeUp} className="body-lg lede measure" style={{ alignSelf: 'end' }}>
+                Demand has never been higher — or more exposed. The platforms that win
+                tomorrow&apos;s contracts must be traceable to the silicon. That is the gap
+                Vortex was built to close.
+              </motion.p>
+            </div>
+
+            <motion.div variants={fadeUp} className="gap-grid">
+              {gapStats.map((s) => (
+                <div key={s.src} className="gap-stat">
+                  <span className="num">{s.num}<span className="u">{s.unit}</span></span>
+                  <p className="cap">{s.cap}</p>
+                  <span className="src">Source · {s.src}</span>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ═══ 02 · THE THESIS ═══ */}
+        <section className="section" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
+          <motion.div className="container" style={{ maxWidth: 1040 }} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <motion.div variants={fadeUp}><Chapter num="02" label="The Thesis" /></motion.div>
+            <motion.p variants={fadeUp} className="statement measure-lg" style={{ marginBottom: 40 }}>
+              We don&apos;t assemble drones. We engineer the whole stack —
+              <span className="hl"> airframe, flight control, edge AI, and ground software </span>
+              under one roof, on Indian soil, with <span className="hl">zero foreign dependency</span>.
+              <span className="dim"> Silicon to sky.</span>
             </motion.p>
-            <motion.div variants={fadeInUp}>
-              <Link href="/systems" className="btn-primary" style={{ margin: '0 auto' }}>
-                View Full Catalog <span className="arr">→</span>
+            <motion.div variants={fadeUp}>
+              <Link href="/capabilities" className="btn-arrow">
+                See how the stack is built <span className="arr">→</span>
               </Link>
             </motion.div>
           </motion.div>
         </section>
 
-        {/* Simplified Platform Categories */}
-        <section className="section" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
-          <motion.div 
-            className="container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="split-5-5" style={{ marginBottom: 64, alignItems: 'flex-end' }}>
-              <motion.div variants={fadeInUp}>
-                <span className="eyebrow">Platform Families</span>
+        {/* ═══ 03 · THE STACK ═══ */}
+        <section className="section" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}>
+          <div className="ambient-tr" />
+          <motion.div className="container" style={{ position: 'relative' }} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <div className="story-head">
+              <motion.div variants={fadeUp}>
+                <Chapter num="03" label="The Stack" />
                 <h2 className="h2" style={{ marginBottom: 0 }}>
-                  Engineered for<br />extreme operations.
+                  Five layers.<br /><span className="g">One native system.</span>
                 </h2>
               </motion.div>
-              <motion.div variants={fadeInUp}>
-                <p className="body-lg" style={{ marginBottom: 16 }}>
-                  Six specialized platforms built on a single avionics stack, enabling rapid deployment and unified training across different mission profiles.
+              <motion.p variants={fadeUp} className="body-lg lede measure" style={{ alignSelf: 'end' }}>
+                Every layer is developed in-house — so security, performance, and upgrades
+                stay in Vortex&apos;s control, never a vendor&apos;s. This is the moat.
+              </motion.p>
+            </div>
+
+            <motion.div variants={fadeUp} className="stack">
+              {capabilityLayers.map((l) => {
+                const progress = l.statusClass === 'blue';
+                return (
+                  <div key={l.num} className="stack-row">
+                    <div className="stack-layer">{l.num}</div>
+                    <div>
+                      <span className={`stack-status${progress ? ' is-progress' : ''}`}>
+                        <span className="dot" />{l.status}
+                      </span>
+                      <div className="stack-name">{l.name}</div>
+                      <p className="stack-sub measure">{l.sub}</p>
+                    </div>
+                    <ul className="stack-tech">
+                      {l.tech.slice(0, 4).map((t) => (
+                        <li key={t}>{t}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ═══ 04 · THE PLATFORMS ═══ */}
+        <section className="section" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
+          <motion.div className="container" initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <div className="story-head">
+              <motion.div variants={fadeUp}>
+                <Chapter num="04" label="The Platforms" />
+                <h2 className="h2" style={{ marginBottom: 0 }}>
+                  Six platforms.<br /><span className="g">Every mission profile.</span>
+                </h2>
+              </motion.div>
+              <motion.div variants={fadeUp} style={{ alignSelf: 'end' }}>
+                <p className="body-lg lede measure" style={{ marginBottom: 16 }}>
+                  One avionics stack, six airframes. Rapid deployment and unified training
+                  across defence, enterprise, and agriculture.
                 </p>
                 <Link href="/systems" className="btn-arrow">
-                  Explore Specifications <span className="arr">→</span>
+                  View full catalog <span className="arr">→</span>
                 </Link>
               </motion.div>
             </div>
 
-            <motion.div variants={fadeInUp} className="cards-auto" style={{ border: '1px solid var(--line)', background: 'var(--line)', gap: '1px' }}>
-              {highlightCategories.map((c) => (
-                <div key={c.id} className="card card-accent" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                    <span className={`tag ${c.tagClass}`}>{c.tag}</span>
+            <motion.div variants={fadeUp}>
+              {domains.map((d) => (
+                <div key={d.title} className="domain">
+                  <div className="domain-head">
+                    <span className="domain-title">{d.title}</span>
+                    <span className="domain-meta">{d.meta}</span>
                   </div>
+                  {d.ids.map((id) => {
+                    const s = byId[id];
+                    if (!s) return null;
+                    return (
+                      <Link key={id} href={`/systems/${id}`} className="platform">
+                        <span className={`platform-id${s.featured ? ' restricted' : ''}`}>{s.num}</span>
+                        <span>
+                          <span className="platform-name" style={{ display: 'block' }}>{s.name}</span>
+                          <span className="platform-cat">{s.category}</span>
+                          <span className="platform-desc" style={{ display: 'block' }}>{s.sub}</span>
+                        </span>
+                        <span className={`platform-spec${s.featured ? ' restricted' : ''}`}>
+                          {s.featured ? 'Restricted · NDA' : s.keySpec}
+                        </span>
+                        <span className="platform-arrow">→</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
 
-                  <div className="display" style={{ fontSize: 'clamp(26px, 3vw, 36px)', marginBottom: 12 }}>
-                    {c.name}
-                  </div>
-                  <p className="body-md" style={{ marginBottom: 32, flex: 1 }}>
-                    {c.pitch}
-                  </p>
+        {/* ═══ 05 · THE PROOF ═══ */}
+        <section className="section" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}>
+          <div className="ambient-center" />
+          <motion.div className="container" style={{ position: 'relative' }} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <div className="story-head">
+              <motion.div variants={fadeUp}>
+                <Chapter num="05" label="The Proof" />
+                <h2 className="h2" style={{ marginBottom: 0 }}>
+                  Not a render.<br /><span className="g">Built to be checked.</span>
+                </h2>
+              </motion.div>
+              <motion.p variants={fadeUp} className="body-lg lede measure" style={{ alignSelf: 'end' }}>
+                Flight-proven hardware, documented to the standard of entities that expect to
+                audit it — MoD due diligence, export review, supply-chain inspection.
+              </motion.p>
+            </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, marginBottom: 24, background: 'var(--line)' }}>
-                    {c.specs.map((s) => (
-                      <div key={s.k} style={{ background: 'var(--surface-2)', padding: '16px' }}>
-                        <div className="display" style={{ fontSize: 18, color: 'var(--accent)', lineHeight: 1 }}>
-                          {s.v}
-                        </div>
-                        <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--muted)', textTransform: 'uppercase', marginTop: 6 }}>
-                          {s.k}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            <motion.div variants={fadeUp} className="proof-row" style={{ marginBottom: 'clamp(48px, 6vw, 80px)' }}>
+              {proof.map((p) => (
+                <div key={p.k + p.v} className="proof-cell">
+                  <span className="k">{p.g ? <span className="g">{p.k}</span> : p.k}</span>
+                  <span className="v">{p.v}</span>
+                </div>
+              ))}
+            </motion.div>
 
-                  <div className="mono" style={{ fontSize: 11, letterSpacing: '0.14em', color: 'var(--muted)', borderTop: '1px solid var(--line)', paddingTop: 16 }}>
-                    Featuring: <span style={{ color: 'var(--text)' }}>{c.example}</span>
+            <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '0 clamp(32px, 4vw, 64px)' }}>
+              {values.slice(0, 6).map((v) => (
+                <div key={v.num} className="principle">
+                  <span className="principle-num">{v.num}</span>
+                  <div>
+                    <div className="principle-title">{v.title}</div>
+                    <p className="principle-body">{v.body}</p>
                   </div>
                 </div>
               ))}
@@ -164,76 +268,58 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* Unified Why Vortex Section */}
-        <section className="section" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}>
-          <div className="ambient-tr" />
-          <motion.div 
-            className="container" style={{ position: 'relative' }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <div className="split-7-5" style={{ marginBottom: 64 }}>
-              <motion.div variants={fadeInUp}>
-                <span className="eyebrow">The Advantage</span>
+        {/* ═══ 06 · THE JOURNEY ═══ */}
+        <section className="section" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
+          <motion.div className="container" initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <div className="story-head">
+              <motion.div variants={fadeUp}>
+                <Chapter num="06" label="The Journey" />
                 <h2 className="h2" style={{ marginBottom: 0 }}>
-                  Built differently.<br /><span className="g">By design.</span>
+                  Student team to<br /><span className="g">drone company. One year.</span>
                 </h2>
               </motion.div>
-              <motion.p variants={fadeInUp} className="body-lg" style={{ alignSelf: 'end' }}>
-                We don&apos;t just assemble off-the-shelf parts. We engineer the core infrastructure, ensuring complete control over security, performance, and upgrades.
+              <motion.p variants={fadeUp} className="body-lg lede measure" style={{ alignSelf: 'end' }}>
+                Every subsystem earned its TRL-6 rating in the field, not the lab — debugged at
+                competitions across North India before it ever became a product.
               </motion.p>
             </div>
 
-            <motion.div variants={staggerContainer} className="cards-auto-sm" style={{ border: '1px solid var(--line)', gap: '1px' }}>
-              {whyVortex.map((d, i) => (
-                <motion.div
-                  variants={fadeInUp}
-                  key={d.num}
-                  className="card"
-                  style={{
-                    padding: 'clamp(32px, 4vw, 48px)',
-                    borderTop: `2px solid ${i === 0 ? 'var(--accent)' : 'transparent'}`,
-                  }}
-                >
-                  <div className="mono" style={{ fontSize: 12, letterSpacing: '0.22em', color: 'var(--accent)', opacity: 0.7, marginBottom: 20 }}>
-                    {d.num}
+            <motion.div variants={fadeUp} className="journey">
+              {timeline.map((t, i) => (
+                <div key={t.year} className={`journey-row${i === timeline.length - 1 ? ' is-future' : ''}`}>
+                  <span className="journey-year">{t.year}</span>
+                  <div>
+                    <div className="journey-title">{t.title}</div>
+                    <p className="journey-body">{t.body}</p>
                   </div>
-                  <div className="display" style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.12, marginBottom: 16 }}>
-                    {d.title}
-                  </div>
-                  <p style={{ fontSize: 15, color: 'var(--sub)', lineHeight: 1.72 }}>{d.body}</p>
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           </motion.div>
         </section>
 
-        {/* Clean, minimalist CTA */}
-        <section className="section-tight" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}>
-          <motion.div 
-            className="container"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
-              <span className="eyebrow" style={{ justifyContent: 'center' }}>Next Steps</span>
-              <h2 className="h2" style={{ marginBottom: 24 }}>Ready to deploy?</h2>
-              <p className="body-lg" style={{ marginBottom: 40 }}>
-                Whether you are procuring for defence or exploring enterprise capabilities, connect with our engineering team directly.
+        <IntelStrip />
+
+        {/* ═══ FINAL CTA ═══ */}
+        <section className="section cta-final" style={{ background: 'var(--bg)', borderTop: '1px solid var(--line)' }}>
+          <div className="ambient-tr" />
+          <motion.div className="container cta-final-inner" style={{ position: 'relative' }} initial="hidden" whileInView="visible" viewport={viewport} variants={stagger}>
+            <motion.div variants={fadeUp}>
+              <Chapter num="07" label="Engage" />
+              <h2 className="h2" style={{ marginBottom: 20 }}>Bring us the mission.</h2>
+              <p className="body-lg lede measure" style={{ marginBottom: 0 }}>
+                Whether you procure for defence or scale enterprise operations, you talk to the
+                engineers who built the stack — not a sales layer.
               </p>
-              <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/partner#contact-form" className="btn-primary">
-                  Start Conversation <span className="arr">→</span>
-                </Link>
-                <Link href="/partner/one-pager" className="btn-outline">
-                  Investor Overview
-                </Link>
-              </div>
-            </div>
+            </motion.div>
+            <motion.div variants={fadeUp} style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link href="/partner#contact-form" className="btn-primary">
+                Request a briefing <span className="arr">→</span>
+              </Link>
+              <Link href="/partner/one-pager" className="btn-outline">
+                Investor one-pager
+              </Link>
+            </motion.div>
           </motion.div>
         </section>
       </main>

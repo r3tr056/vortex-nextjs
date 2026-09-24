@@ -6,7 +6,7 @@ import { colors, fonts, fontSizes, letterSpacing, spacing } from './tokens';
 // INPUT COMPONENT
 // ══════════════════════════════════════════════════════════
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type = 'text', style, ...props }, ref) => {
@@ -39,7 +39,7 @@ Input.displayName = 'Input';
 // TEXTAREA COMPONENT
 // ══════════════════════════════════════════════════════════
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, style, ...props }, ref) => {

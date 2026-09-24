@@ -117,8 +117,7 @@ export default function AtlasAgPage() {
   const startRef  = useRef<number>(0);
   const pausedRef = useRef(false);
 
-  /* ── smooth progress bar ── */
-  const tickProgress = useCallback(() => {
+  function tickProgress() {
     if (pausedRef.current) return;
     const elapsed = performance.now() - startRef.current;
     const pct = Math.min((elapsed / INTERVAL) * 100, 100);
@@ -126,10 +125,11 @@ export default function AtlasAgPage() {
     if (pct < 100) {
       rafRef.current = requestAnimationFrame(tickProgress);
     }
-  }, []);
+  }
 
   const goTo = useCallback((idx: number) => {
     if (idx === active) return;
+    setProgress(0);
     setPrev(active);
     setFading(true);
     setTimeout(() => {
@@ -147,7 +147,6 @@ export default function AtlasAgPage() {
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearTimeout(timerRef.current);
-    setProgress(0);
     startRef.current = performance.now();
     rafRef.current   = requestAnimationFrame(tickProgress);
     timerRef.current = setTimeout(advance, INTERVAL);
@@ -243,12 +242,12 @@ export default function AtlasAgPage() {
             position: 'absolute', top: 72, left: 0, right: 0, zIndex: 6,
             padding: '14px 56px', display: 'flex', alignItems: 'center',
             background: 'linear-gradient(to bottom, rgba(6,8,13,0.72) 0%, transparent 100%)',
-          }}>
+          }} className="sys-pad">
             <Link href="/systems" className="hero-back-link"><span>←</span> Back to Systems</Link>
           </div>
 
           {/* ── Hero text (transitions with slide) ── */}
-          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }}>
+          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 860 }} className="sys-pad sys-hero-pad">
 
             {/* eyebrow */}
             <div
@@ -308,7 +307,7 @@ export default function AtlasAgPage() {
           <div style={{
             position: 'absolute', bottom: 48, left: 56, zIndex: 6,
             display: 'flex', flexDirection: 'column', gap: 16,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-left">
             {/* Mono label */}
             <div
               key={`mono-${active}`}
@@ -358,7 +357,7 @@ export default function AtlasAgPage() {
           <div style={{
             position: 'absolute', bottom: 44, right: 56, zIndex: 6,
             display: 'flex', gap: 8,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-right">
             {[
               { label: '←', fn: () => goTo((active - 1 + SLIDES.length) % SLIDES.length) },
               { label: '→', fn: () => goTo((active + 1) % SLIDES.length) },
@@ -400,7 +399,7 @@ export default function AtlasAgPage() {
         ══════════════════════════════════════════════════════ */}
         <section style={{ padding: 0, background: BG2, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
 
-          <div style={{ position: 'absolute', top: 28, left: 56, zIndex: 4 }} className="reveal r1">
+          <div style={{ position: 'absolute', top: 28, left: 56, zIndex: 4 }} className="reveal r1 sys-overlay-label">
             <div className="eyebrow" style={{ marginBottom: 0 }}>Airframe · VAS-02</div>
           </div>
 
@@ -415,12 +414,12 @@ export default function AtlasAgPage() {
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 90, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to bottom, ${BG2} 0%, transparent 100%)` }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 90, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to top, ${BG2} 0%, transparent 100%)` }} />
 
-            <div style={{ position: 'absolute', top: '18%', left: 40, zIndex: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ position: 'absolute', top: '18%', left: 40, zIndex: 4, display: 'flex', flexDirection: 'column', gap: 10 }} className="sys-overlay">
               {[
                 { label: 'Configuration', val: 'Symmetric hexacopter', sub: '6-arm · 6-motor' },
                 { label: 'Frame material', val: 'T700 carbon fibre', sub: 'Fold-arm · field deploy' },
               ].map((c) => (
-                <div key={c.label} style={{ background: 'rgba(6,8,13,0.82)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 195 }} className="reveal r2">
+                <div key={c.label} style={{ background: 'rgba(6,8,13,0.82)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 195 }} className="reveal r2 sys-overlay-card">
                   <Mono>{c.label}</Mono>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 600, color: '#E4EAF4', marginTop: 5, lineHeight: 1 }}>{c.val}</div>
                   <div style={{ fontSize: 11, color: '#52607A', marginTop: 4 }}>{c.sub}</div>
@@ -428,12 +427,12 @@ export default function AtlasAgPage() {
               ))}
             </div>
 
-            <div style={{ position: 'absolute', top: '18%', right: 40, zIndex: 4, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }}>
+            <div style={{ position: 'absolute', top: '18%', right: 40, zIndex: 4, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }} className="sys-overlay">
               {[
                 { label: 'Spray boom', val: 'Folding boom arms', sub: 'Extended-reach nozzles' },
                 { label: 'Payload bay', val: 'Quick-release module', sub: 'Spray / Seed / Hybrid' },
               ].map((c) => (
-                <div key={c.label} style={{ background: 'rgba(6,8,13,0.82)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 195, textAlign: 'right' }} className="reveal r2">
+                <div key={c.label} style={{ background: 'rgba(6,8,13,0.82)', backdropFilter: 'blur(8px)', border: `1px solid rgba(148,211,39,0.14)`, padding: '12px 16px', minWidth: 195, textAlign: 'right' }} className="reveal r2 sys-overlay-card">
                   <Mono>{c.label}</Mono>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 600, color: '#E4EAF4', marginTop: 5, lineHeight: 1 }}>{c.val}</div>
                   <div style={{ fontSize: 11, color: '#52607A', marginTop: 4 }}>{c.sub}</div>
@@ -441,7 +440,7 @@ export default function AtlasAgPage() {
               ))}
             </div>
 
-            <div style={{ position: 'absolute', bottom: 24, left: 56, right: 56, zIndex: 4, display: 'flex', gap: 4 }}>
+            <div style={{ position: 'absolute', bottom: 24, left: 56, right: 56, zIndex: 4, display: 'flex', gap: 4 }} className="sys-overlay-strip">
               {[
                 { val: '10–16 L', key: 'Tank capacity' },
                 { val: '~1 ac/min', key: 'Coverage rate' },
@@ -457,7 +456,7 @@ export default function AtlasAgPage() {
             </div>
           </div>
 
-          <div style={{ padding: '18px 56px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderTop: `1px solid ${LINE}` }}>
+          <div style={{ padding: '18px 56px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderTop: `1px solid ${LINE}` }} className="sys-pad">
             <p style={{ fontSize: 13, color: '#52607A', lineHeight: 1.7, maxWidth: 640 }}>
               Symmetric hexacopter with fold-arm portability, T700 carbon fibre structure, and a universal quick-release payload bay — swap between spray nozzle array, seed spreader, and hybrid configurations without tools.
             </p>
@@ -473,9 +472,9 @@ export default function AtlasAgPage() {
         {/* ══════════════════════════════════════════════════════
             §3  SPRAY SYSTEM — atlas_ag_sprayer2.png
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '55% 45%', background: BG3, borderBottom: `1px solid ${LINE}` }}>
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '55% 45%', background: BG3, borderBottom: `1px solid ${LINE}` }} className="sys-split">
 
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 540 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 540 }} className="sys-media">
             <Image
               src="/systems/atlas_ag/atlas_ag_sprayer2.png"
               alt="Atlas Ag — wide boom arms fully extended, 6-nozzle spray system"
@@ -490,7 +489,7 @@ export default function AtlasAgPage() {
             </div>
           </div>
 
-          <div style={{ padding: '68px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ padding: '68px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }} className="sys-pad sys-pad-y">
             <div className="eyebrow reveal r1">Spray System</div>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(30px, 3.8vw, 54px)', fontWeight: 700, lineHeight: 0.91, letterSpacing: '-0.01em', color: '#E4EAF4', marginBottom: 22 }} className="reveal r2">
               Wide boom.<br /><span style={{ color: GREEN }}>Zero drift.</span>
@@ -524,7 +523,7 @@ export default function AtlasAgPage() {
         {/* ══════════════════════════════════════════════════════
             §4  NOZZLE MACRO — atlas_ag_sprayer_macro.png
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '70vh', overflow: 'hidden', background: BG }}>
+        <section style={{ padding: 0, position: 'relative', height: '70vh', overflow: 'hidden', background: BG }} className="sys-scene">
           <Image
             src="/systems/atlas_ag/atlas_ag_sprayer_macro.png"
             alt="Atlas Ag — single variable-rate nozzle atomising green spray"
@@ -535,7 +534,7 @@ export default function AtlasAgPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to bottom, rgba(6,8,13,0.85) 0%, rgba(6,8,13,0.04) 22%, rgba(6,8,13,0.04) 65%, rgba(6,8,13,0.96) 100%)` }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to left, rgba(6,8,13,0.88) 0%, rgba(6,8,13,0.50) 28%, transparent 55%)` }} />
 
-          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 400, textAlign: 'right' }}>
+          <div style={{ position: 'absolute', bottom: 56, right: 56, zIndex: 3, maxWidth: 400, textAlign: 'right' }} className="sys-scene-text">
             <Mono color={GREEN_MID}>Variable-Rate Nozzle · Flat-Fan Atomisation</Mono>
             <div style={{ height: 16 }} />
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(24px, 3vw, 44px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.01em', color: '#E4EAF4' }}>
@@ -546,7 +545,7 @@ export default function AtlasAgPage() {
             </p>
           </div>
 
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3, display: 'flex', flexDirection: 'column', gap: 14 }} className="sys-scene-text">
             {[
               { val: 'Flat-fan', key: 'Nozzle type' },
               { val: 'Var-rate', key: 'L/ha control' },
@@ -566,9 +565,9 @@ export default function AtlasAgPage() {
         {/* ══════════════════════════════════════════════════════
             §5  TANK MACRO — atlas_ag_tank_macro.png
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '55% 45%', background: BG3, borderBottom: `1px solid ${LINE}` }}>
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '55% 45%', background: BG3, borderBottom: `1px solid ${LINE}` }} className="sys-split">
 
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 500 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 500 }} className="sys-media">
             <Image
               src="/systems/atlas_ag/atlas_ag_tank_macro.png"
               alt="Atlas Ag — tank body with outlet valve and green flow tube macro"
@@ -583,7 +582,7 @@ export default function AtlasAgPage() {
             </div>
           </div>
 
-          <div style={{ padding: '68px 56px 68px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ padding: '68px 56px 68px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }} className="sys-pad sys-pad-y">
             <div className="eyebrow reveal r1">Tank + Plumbing</div>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(28px, 3.5vw, 50px)', fontWeight: 700, lineHeight: 0.92, letterSpacing: '-0.01em', color: '#E4EAF4', marginBottom: 22 }} className="reveal r2">
               Quick-fill.<br /><span style={{ color: GREEN }}>Tool-free swap.</span>
@@ -614,7 +613,7 @@ export default function AtlasAgPage() {
         {/* ══════════════════════════════════════════════════════
             §6  FIELD — atlas_ag_field1.png
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '65vh', overflow: 'hidden', background: '#060A04' }}>
+        <section style={{ padding: 0, position: 'relative', height: '65vh', overflow: 'hidden', background: '#060A04' }} className="sys-scene">
           <Image
             src="/systems/atlas_ag/atlas_ag_field1.png"
             alt="Atlas Ag spraying over soybean field — blue sky daytime"
@@ -624,7 +623,7 @@ export default function AtlasAgPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: `linear-gradient(to bottom, rgba(6,8,13,0.72) 0%, rgba(6,8,13,0.05) 22%, rgba(6,8,13,0.05) 65%, rgba(6,8,13,0.92) 100%)` }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: `linear-gradient(to right, rgba(6,8,13,0.75) 0%, transparent 30%, transparent 70%, rgba(6,8,13,0.75) 100%)` }} />
 
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }} className="sys-scene-text">
             <Mono color="rgba(148,211,39,0.80)">Field Operations · Active Spray · Soybean</Mono>
             <div style={{ height: 14 }} />
             <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(26px, 3.2vw, 48px)', fontWeight: 700, lineHeight: 0.95, letterSpacing: '-0.01em', color: '#E4EAF4' }}>
@@ -639,9 +638,9 @@ export default function AtlasAgPage() {
         {/* ══════════════════════════════════════════════════════
             §7  SPECS — id="specs"
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} id="specs">
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split" id="specs">
 
-          <div style={{ padding: '80px 56px', borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ padding: '80px 56px', borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-pad sys-pad-y">
             <div style={{ position: 'absolute', top: 0, right: 0, width: '60%', height: '50%', background: `radial-gradient(ellipse 80% 80% at 80% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
             <div className="eyebrow reveal r1" style={{ position: 'relative' }}>Technical Specifications</div>
@@ -675,7 +674,7 @@ export default function AtlasAgPage() {
             </div>
           </div>
 
-          <div style={{ position: 'relative', minHeight: 560, overflow: 'hidden', background: BG }}>
+          <div style={{ position: 'relative', minHeight: 560, overflow: 'hidden', background: BG }} className="sys-media">
             <Image
               src="/systems/atlas_ag/atlas_ag_hero2.png"
               alt="Atlas Ag VAS-02 — full boom arm configuration, studio"
@@ -697,7 +696,7 @@ export default function AtlasAgPage() {
         ══════════════════════════════════════════════════════ */}
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
-          <div style={{ padding: '64px 56px 52px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }}>
+          <div style={{ padding: '64px 56px 52px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }} className="sys-pad sys-pad-y">
             <div>
               <div className="eyebrow reveal r1">Field Operations</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(28px, 4vw, 56px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
@@ -709,7 +708,7 @@ export default function AtlasAgPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }} className="sys-grid-2">
             {[
               { src: '/systems/atlas_ag/atlas_ag_field2.png', cap: 'Maize — early season spray, golden crop rows', label: 'KHARIF' },
               { src: '/systems/atlas_ag/atlas_ag_field3.png', cap: 'Corn — tall crop canopy, full boom coverage',   label: 'RABI'   },
@@ -731,14 +730,14 @@ export default function AtlasAgPage() {
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }} className="sys-grid-4">
             {[
               { title: 'Precision Spraying', body: 'Variable-rate flat-fan nozzles outside the motor wash zone — pesticides, herbicides, and liquid fertilisers with ±5% flow accuracy.' },
               { title: 'Seed Broadcasting',  body: 'Interchangeable seed spreader module with programmable broadcast patterns. Paddy DSR, wheat, mustard, vegetable seed deployment.' },
               { title: 'SMAM Subsidy Path',  body: 'Eligible under Sub-Mission on Agricultural Mechanization — post-TC empanelment enables 40–100% capital subsidy for farmer and FPO buyers.' },
               { title: 'DaaS Per-Acre',      body: 'No capital purchase required — per-acre drone service model for FPO partnerships, NAMO Drone Didi SHG groups, and CHC deployments.' },
             ].map((f) => (
-              <div key={f.title} style={{ background: BG2, padding: '30px 26px', borderTop: `2px solid ${GREEN}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={f.title} style={{ background: BG2, padding: '30px 26px', borderTop: `2px solid ${GREEN}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 56, background: `linear-gradient(to bottom, ${GREEN_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 600, color: '#E4EAF4', marginBottom: 10, position: 'relative' }}>{f.title}</div>
                 <p style={{ fontSize: 12, color: '#52607A', lineHeight: 1.72, position: 'relative' }}>{f.body}</p>
@@ -761,7 +760,7 @@ export default function AtlasAgPage() {
             <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: `linear-gradient(to right, ${BG2} 0%, transparent 40%)` }} />
           </div>
 
-          <div style={{ position: 'relative', zIndex: 2, padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+          <div style={{ position: 'relative', zIndex: 2, padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }} className="sys-split sys-pad sys-pad-y">
             <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '60%', background: `radial-gradient(ellipse 80% 80% at 10% 10%, ${GREEN_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
             <div style={{ position: 'relative' }}>
@@ -813,7 +812,7 @@ export default function AtlasAgPage() {
 
 
         {/* Prev / Next nav */}
-        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }}>
+        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }} className="sys-pad">
           <Link href="/systems/vas01" className="btn-outline">← VAS-01 · Atlas</Link>
           <Link href="/systems" className="btn-outline" style={{ color: '#52607A' }}>All Platforms</Link>
           <Link href="/systems/vas03" className="btn-outline">VAS-03 · Ranger →</Link>

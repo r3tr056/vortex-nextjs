@@ -117,8 +117,7 @@ export default function RangerPage() {
   const startRef  = useRef<number>(0);
   const pausedRef = useRef(false);
 
-  /* ── smooth progress bar ── */
-  const tickProgress = useCallback(() => {
+  function tickProgress() {
     if (pausedRef.current) return;
     const elapsed = performance.now() - startRef.current;
     const pct = Math.min((elapsed / INTERVAL) * 100, 100);
@@ -126,10 +125,11 @@ export default function RangerPage() {
     if (pct < 100) {
       rafRef.current = requestAnimationFrame(tickProgress);
     }
-  }, []);
+  }
 
   const goTo = useCallback((idx: number) => {
     if (idx === active) return;
+    setProgress(0);
     setPrev(active);
     setFading(true);
     setTimeout(() => {
@@ -147,7 +147,6 @@ export default function RangerPage() {
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     if (timerRef.current) clearTimeout(timerRef.current);
-    setProgress(0);
     startRef.current = performance.now();
     rafRef.current   = requestAnimationFrame(tickProgress);
     timerRef.current = setTimeout(advance, INTERVAL);
@@ -245,14 +244,14 @@ export default function RangerPage() {
             position: 'absolute', top: 72, left: 0, right: 0, zIndex: 6,
             padding: '14px 56px', display: 'flex', alignItems: 'center',
             background: 'linear-gradient(to bottom, rgba(6,8,13,0.72) 0%, transparent 100%)',
-          }}>
+          }} className="sys-pad">
             <Link href="/systems" className="hero-back-link">
               <span>←</span> Back to Systems
             </Link>
           </div>
 
           {/* ── Hero text (transitions with slide) ── */}
-          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 820 }}>
+          <div style={{ position: 'relative', zIndex: 5, padding: '160px 56px 80px', maxWidth: 820 }} className="sys-pad sys-hero-pad">
 
             {/* eyebrow */}
             <div
@@ -312,7 +311,7 @@ export default function RangerPage() {
           <div style={{
             position: 'absolute', bottom: 48, left: 56, zIndex: 6,
             display: 'flex', flexDirection: 'column', gap: 16,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-left">
             {/* Mono caption */}
             <div
               key={`mono-${active}`}
@@ -365,7 +364,7 @@ export default function RangerPage() {
           <div style={{
             position: 'absolute', bottom: 44, right: 56, zIndex: 6,
             display: 'flex', gap: 8,
-          }}>
+          }} className="sys-hero-ctrl sys-hero-ctrl-right">
             {[
               { label: '←', fn: () => goTo((active - 1 + SLIDES.length) % SLIDES.length) },
               { label: '→', fn: () => goTo((active + 1) % SLIDES.length) },
@@ -407,10 +406,10 @@ export default function RangerPage() {
             §2  TOP VIEW — DESIGN AESTHETICS
             Left = image · Right = text · BG2 base
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '80vh', background: BG2, borderBottom: `1px solid ${LINE}` }}>
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '80vh', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split">
 
           {/* Image column */}
-          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 560 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', minHeight: 560 }} className="sys-media">
             <Image
               src="/systems/ranger/ranger_top_view.png"
               alt="Ranger VAS-03 — symmetric hexacopter top view"
@@ -430,7 +429,7 @@ export default function RangerPage() {
           </div>
 
           {/* Text column */}
-          <div style={{ padding: '80px 64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: `1px solid ${LINE}`, background: BG2, position: 'relative' }}>
+          <div style={{ padding: '80px 64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderLeft: `1px solid ${LINE}`, background: BG2, position: 'relative' }} className="sys-pad sys-pad-y">
             {/* Blue glow */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `radial-gradient(ellipse 80% 60% at 80% 30%, ${BLUE_DIM} 0%, transparent 70%)` }} />
 
@@ -486,7 +485,7 @@ export default function RangerPage() {
           </div>
 
           {/* Text — left */}
-          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '80px 56px', maxWidth: 540 }} className="sys-pad sys-pad-y">
             <div className="eyebrow reveal r1">Propulsion System</div>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(40px, 5vw, 70px)', fontWeight: 700, lineHeight: 0.9, letterSpacing: '-0.015em', marginBottom: 24, color: '#E4EAF4' }} className="reveal r2">
               Built to endure<br />where others<br /><span style={{ color: GREEN }}>land.</span>
@@ -531,7 +530,7 @@ export default function RangerPage() {
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
           {/* Header */}
-          <div style={{ padding: '80px 56px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, borderBottom: `1px solid ${LINE}` }}>
+          <div style={{ padding: '80px 56px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, borderBottom: `1px solid ${LINE}` }} className="sys-split sys-pad sys-pad-y">
             <div>
               <div className="eyebrow eyebrow-blue reveal r1">System Architecture</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(36px, 4.5vw, 62px)', fontWeight: 700, lineHeight: 0.91, letterSpacing: '-0.01em', color: '#E4EAF4' }} className="reveal r2">
@@ -569,7 +568,7 @@ export default function RangerPage() {
           </div>
 
           {/* Three annotation cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: LINE }} className="sys-grid-3">
             {[
               {
                 layer: 'Arms → lower plate',
@@ -590,7 +589,7 @@ export default function RangerPage() {
                 accent: BLUE,
               },
             ].map((item) => (
-              <div key={item.title} style={{ background: BG2, padding: '40px 36px', borderTop: `2px solid ${item.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={item.title} style={{ background: BG2, padding: '40px 36px', borderTop: `2px solid ${item.accent}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 {/* Top glow strip matching accent */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, background: `linear-gradient(to bottom, ${item.accent === BLUE ? BLUE_DIM : GREEN_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#52607A', marginBottom: 20, position: 'relative' }}>{item.layer}</div>
@@ -601,7 +600,7 @@ export default function RangerPage() {
           </div>
 
           {/* Component manifest grid — 4 columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE, borderTop: `1px solid ${LINE}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE, borderTop: `1px solid ${LINE}` }} className="sys-grid-4 sys-grid-dense">
             {[
               { component: 'Cube Orange Plus', role: 'Flight controller',       layer: 'Mid plate' },
               { component: 'Jetson Orin Nano', role: 'Onboard AI compute',      layer: 'Top plate' },
@@ -612,7 +611,7 @@ export default function RangerPage() {
               { component: 'Drone ID Tag',     role: 'DGCA Digital Sky',        layer: 'Mid plate' },
               { component: 'ADS-B Out',        role: 'Airspace broadcast',      layer: 'Mid plate' },
             ].map((c) => (
-              <div key={c.component} style={{ background: BG, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 6 }} className="reveal r3">
+              <div key={c.component} style={{ background: BG, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 6 }} className="reveal r3 sys-card">
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 17, fontWeight: 600, color: '#E4EAF4' }}>{c.component}</div>
                 <div style={{ fontSize: 12, color: '#52607A' }}>{c.role}</div>
                 <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: BLUE, marginTop: 4 }}>{c.layer}</div>
@@ -625,7 +624,7 @@ export default function RangerPage() {
         {/* ══════════════════════════════════════════════════════
             §5  SCENE — full-bleed atmospheric
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, position: 'relative', height: '72vh', overflow: 'hidden', background: BG }}>
+        <section style={{ padding: 0, position: 'relative', height: '72vh', overflow: 'hidden', background: BG }} className="sys-scene">
           <Image
             src="/systems/ranger/ranger_scene.png"
             alt="Ranger in field deployment — enterprise survey"
@@ -638,7 +637,7 @@ export default function RangerPage() {
           <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: `linear-gradient(to bottom, rgba(6,8,13,0.82) 0%, rgba(6,8,13,0.06) 22%, rgba(6,8,13,0.06) 60%, rgba(6,8,13,0.94) 100%)` }} />
 
           {/* Caption bottom-left */}
-          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }}>
+          <div style={{ position: 'absolute', bottom: 56, left: 56, zIndex: 3 }} className="sys-scene-text">
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: BLUE, marginBottom: 14 }}>
               Field Deployment · Enterprise Survey
             </div>
@@ -656,10 +655,10 @@ export default function RangerPage() {
             §6  SPECS + DIFFERENT SCENE
             Left = spec table BG2 · Right = image
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} id="specs">
+        <section style={{ padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', background: BG2, borderBottom: `1px solid ${LINE}` }} className="sys-split" id="specs">
 
           {/* Specs column */}
-          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ padding: '80px 56px', background: BG2, borderRight: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-pad sys-pad-y">
             {/* Blue glow top-right corner */}
             <div style={{ position: 'absolute', top: 0, right: 0, width: '60%', height: '50%', background: `radial-gradient(ellipse 80% 80% at 80% 10%, ${BLUE_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
@@ -692,7 +691,7 @@ export default function RangerPage() {
           </div>
 
           {/* Scene image column */}
-          <div style={{ position: 'relative', minHeight: 560, overflow: 'hidden', background: BG }}>
+          <div style={{ position: 'relative', minHeight: 560, overflow: 'hidden', background: BG }} className="sys-media">
             <Image
               src="/systems/ranger/ranger_different_scene.png"
               alt="Ranger alternate deployment — survey operations"
@@ -717,7 +716,7 @@ export default function RangerPage() {
         <section style={{ padding: 0, background: BG, borderBottom: `1px solid ${LINE}` }}>
 
           {/* Header strip */}
-          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }}>
+          <div style={{ padding: '72px 56px 56px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: `1px solid ${LINE}`, gap: 40, flexWrap: 'wrap' }} className="sys-pad sys-pad-y">
             <div>
               <div className="eyebrow reveal r1">Defense Configuration</div>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 4.5vw, 62px)', fontWeight: 700, lineHeight: 0.90, letterSpacing: '-0.015em', color: '#E4EAF4' }} className="reveal r2">
@@ -730,7 +729,7 @@ export default function RangerPage() {
           </div>
 
           {/* Two military images side by side */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: LINE }} className="sys-grid-2">
             {[
               { src: '/systems/ranger/ranger_military_1.png', cap: 'Forward ISR deployment' },
               { src: '/systems/ranger/ranger_military_2.png', cap: 'Tethered persistent surveillance' },
@@ -753,14 +752,14 @@ export default function RangerPage() {
           </div>
 
           {/* Defense capability cards — 4 columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: LINE }} className="sys-grid-4">
             {[
               { title: 'MoD Exempt',     body: 'No civilian type-certificate required for defense procurement and field trials under Ministry of Defence exemption.' },
               { title: 'Encrypted Link', body: 'SIYI encrypted RC + HD video downlink. Zero unencrypted telemetry in flight — ground-to-air and air-to-ground both secured.' },
               { title: 'Tethered ISR',   body: 'Unlimited endurance tethered configuration for fixed-point persistent forward surveillance at platoon level.' },
               { title: 'AI Cueing',      body: 'Jetson Orin Nano runs YOLOv8 target detection onboard. No GCS uplink required for cueing — works in denied RF environments.' },
             ].map((f) => (
-              <div key={f.title} style={{ background: BG2, padding: '36px 32px', borderTop: `2px solid ${GREEN}`, position: 'relative', overflow: 'hidden' }} className="reveal r2">
+              <div key={f.title} style={{ background: BG2, padding: '36px 32px', borderTop: `2px solid ${GREEN}`, position: 'relative', overflow: 'hidden' }} className="reveal r2 sys-card">
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 64, background: `linear-gradient(to bottom, ${GREEN_DIM} 0%, transparent 100%)`, pointerEvents: 'none' }} />
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 600, color: '#E4EAF4', marginBottom: 12, position: 'relative' }}>{f.title}</div>
                 <p style={{ fontSize: 13, color: '#52607A', lineHeight: 1.72, position: 'relative' }}>{f.body}</p>
@@ -774,7 +773,7 @@ export default function RangerPage() {
             §8  CTA — PROCUREMENT
             BG2 · blue identity returns · two-col layout
         ══════════════════════════════════════════════════════ */}
-        <section style={{ padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: BG2, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }}>
+        <section style={{ padding: '100px 56px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center', background: BG2, borderBottom: `1px solid ${LINE}`, position: 'relative', overflow: 'hidden' }} className="sys-split sys-pad sys-pad-y">
           {/* Blue glow top-left */}
           <div style={{ position: 'absolute', top: 0, left: 0, width: '50%', height: '60%', background: `radial-gradient(ellipse 80% 80% at 10% 10%, ${BLUE_DIM} 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
@@ -809,7 +808,7 @@ export default function RangerPage() {
         </section>
 
         {/* Prev / Next navigation strip */}
-        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }}>
+        <div style={{ padding: '32px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${LINE}`, flexWrap: 'wrap', gap: 16, background: BG }} className="sys-pad">
           <Link href="/systems/vas02" className="btn-outline">← VAS-02 · Atlas Ag</Link>
           <Link href="/systems" className="btn-arrow" style={{ color: '#52607A' }}>
             All platforms <span className="arr">→</span>

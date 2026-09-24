@@ -248,7 +248,7 @@ Flex.displayName = 'Flex';
 // STACK COMPONENT (Vertical Flex)
 // ══════════════════════════════════════════════════════════
 
-export interface StackProps extends Omit<FlexProps, 'direction'> {}
+export type StackProps = Omit<FlexProps, 'direction'>;
 
 export const Stack = React.forwardRef<HTMLDivElement, StackProps>((props, ref) => {
   return <Flex ref={ref} direction="column" {...props} />;
